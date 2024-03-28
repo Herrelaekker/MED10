@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum BuildState
+/*public enum BuildState
 {
     Wait,
     Prepare,
@@ -84,10 +84,7 @@ public class BuildTower : MonoBehaviour
                 }
                 break;
             case BuildState.Prepare:
-                if (timer >= prepareTime)
-                {
-                    SwitchState(BuildState.Activation);
-                }
+
                 break;
             case BuildState.Activation:
                 if (Input.GetKey(KeyCode.A))
@@ -151,3 +148,4 @@ public class BuildTower : MonoBehaviour
 
 
 }
+*/
