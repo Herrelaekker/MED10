@@ -20,6 +20,11 @@ public class BlueprintMode : MonoBehaviour
         buildMode = FindObjectOfType<BuildMode>();
     }
 
+    public void StartBlueprintMode()
+    {
+        blueprintUI.SetActive(true);
+    }
+
     public void SpawnBuilding(GameObject buildingObj)
     {
         var newBuilding = Instantiate(buildingObj);

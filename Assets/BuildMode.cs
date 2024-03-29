@@ -9,7 +9,8 @@ public enum BuildState
     None,
     PickBlock,
     Conjure,
-    PlaceBlock
+    PlaceBlock,
+    BlockPlaceTransition
 }
 
 public class BuildMode : MonoBehaviour
@@ -20,8 +21,13 @@ public class BuildMode : MonoBehaviour
 
     private GameObject pickedBlock;
     private GameObject conjuredBlock;
-    float timer = 0;
+    float conjureTimer = 0;
     public float conjureTime = 5f;
+
+    float placingTimer = 0;
+    public float placingTime = 2f;
+    Vector3 placingBlockStartPos;
+    Vector3 placingBlockEndPos;
 
     public Transform conjuringTransform;
     BlueprintMode blueprintMode;
@@ -29,6 +35,7 @@ public class BuildMode : MonoBehaviour
     public GameObject posOptionBtnPrefab;
 
     GameObject[,] posOptionBtns;
+    BoundsInt buildingArea;
 
     private void Start()
     {
@@ -37,16 +44,16 @@ public class BuildMode : MonoBehaviour
 
     public void StartBuildMode()
     {
-        BoundsInt area = blueprintMode.GetCurrentBuildingBounds();
-        print(area);
+        buildingArea = blueprintMode.GetCurrentBuildingBounds();
+        print(buildingArea);
         //TileBase[] blueprintTiles = blueprintMode.GetCurrentBuildingTiles();
 
-        Vector3 origin = area.position;
-        posOptionBtns = new GameObject[area.size.x , area.size.y];
+        Vector3 origin = buildingArea.position;
+        posOptionBtns = new GameObject[buildingArea.size.x , buildingArea.size.y];
 
-        for (int x = 0; x < area.size.x; x++)
+        for (int x = 0; x < buildingArea.size.x; x++)
         {
-            for (int y = 0; y < area.size.y; y++)
+            for (int y = 0; y < buildingArea.size.y; y++)
             {
                 print(x + "," + y);
                 var block = Instantiate(posOptionBtnPrefab, placeBlockUI.transform);
@@ -68,6 +75,20 @@ public class BuildMode : MonoBehaviour
         }
     }
 
+    private bool IsArrayEmpty(GameObject[,] essenceArray, int row, int col)
+    {
+        if (essenceArray == null || essenceArray.Length == 0) return true;
+        for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
+        {
+            if (essenceArray[i,j] != null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void SwitchState(BuildState newState)
     {
         state = newState;
@@ -82,6 +103,33 @@ public class BuildMode : MonoBehaviour
                 break;
             case BuildState.PlaceBlock:
                 placeBlockUI.SetActive(true);
+                int rowWithBtns = 0;
+                bool rowChosen = false;
+
+                for (int y = 0; y < buildingArea.size.y; y++)
+                {
+                    for (int x = 0; x < buildingArea.size.x; x++)
+                    {
+                        if (!posOptionBtns[x, y])
+                        {
+                            continue;
+                        }
+
+                        if (!rowChosen)
+                        {
+                            rowWithBtns = y;
+                            rowChosen = true;
+                        }
+                        if (rowChosen && y == rowWithBtns)
+                        {
+                            posOptionBtns[x, y].SetActive(true);
+                        }
+                        else
+                        {
+                            posOptionBtns[x, y].SetActive(false); 
+                        }
+                    }
+                }
                 break;
         }
     }
@@ -103,15 +151,33 @@ public class BuildMode : MonoBehaviour
         switch (state)
         {
             case BuildState.Conjure:
-                timer += Time.fixedDeltaTime;
+                conjureTimer += Time.fixedDeltaTime;
 
                 if (Input.GetKey(KeyCode.A))
                 {
                     ConjureStone(true);
                 }
-                else if (timer >= conjureTime)
+                else if (conjureTimer >= conjureTime)
                 {
                     ConjureStone(false);
+                }
+                break;
+            case BuildState.BlockPlaceTransition:
+                placingTimer += Time.fixedDeltaTime;
+                float t = placingTimer / placingTime;
+                
+                conjuredBlock.transform.position = Vector3.Lerp(placingBlockStartPos, placingBlockEndPos, t);
+                if (t >= 1)
+                {
+                    placingTimer = 0;
+                    if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
+                    {
+                        //GOTO Next phase
+                        state = BuildState.None;
+                        blueprintMode.StartBlueprintMode();
+                    }
+                    else
+                        SwitchState(BuildState.PickBlock);
                 }
                 break;
         }
@@ -120,12 +186,19 @@ public class BuildMode : MonoBehaviour
     void PositionChosen(Vector2Int gridPos)
     {
         print(gridPos);
-        posOptionBtns[gridPos.x, gridPos.y].SetActive(false);
-        SwitchState(BuildState.PickBlock);
+        Destroy(posOptionBtns[gridPos.x, gridPos.y]);
+
+        Vector3 origin = buildingArea.position;
+        Vector3 worldPos = origin + new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0);
+        placingBlockEndPos = worldPos;
+
+        placingBlockStartPos = conjuredBlock.transform.position;
+        SwitchState(BuildState.BlockPlaceTransition);
     }
 
     void ConjureStone(bool correctlyConjured)
     {
+        conjureTimer = 0;
         conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
         SwitchState(BuildState.PlaceBlock);
     }

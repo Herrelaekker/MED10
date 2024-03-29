@@ -16,8 +16,10 @@ public class Building : MonoBehaviour
 
         if (gridmanager.CanTakeArea(areaTemp))
         {
+            print("true");
             return true;
         }
+        print("false");
         return false;
     }
 
