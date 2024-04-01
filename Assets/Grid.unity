@@ -155,7 +155,7 @@ MonoBehaviour:
   pickBlockUI: {fileID: 40045165}
   placeBlockUI: {fileID: 234766813}
   conjureTime: 5
-  placingTime: 2
+  placingTime: 1
   conjuringTransform: {fileID: 373112218}
   posOptionBtnPrefab: {fileID: 2999547512229102697, guid: 38c2bf0998dc4144f98412be7ea557f3,
     type: 3}
@@ -591,7 +591,7 @@ TilemapRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267750467}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1

@@ -37,6 +37,8 @@ public class BuildMode : MonoBehaviour
     GameObject[,] posOptionBtns;
     BoundsInt buildingArea;
 
+    public Sprite crackedWall;
+
     private void Start()
     {
         blueprintMode = FindObjectOfType<BlueprintMode>();
@@ -200,6 +202,8 @@ public class BuildMode : MonoBehaviour
     {
         conjureTimer = 0;
         conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
+        if (!correctlyConjured || Random.Range(1,101) > 80)
+            conjuredBlock.GetComponent<SpriteRenderer>().sprite = crackedWall;
         SwitchState(BuildState.PlaceBlock);
     }
 }
