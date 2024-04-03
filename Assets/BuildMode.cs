@@ -38,26 +38,45 @@ public class BuildMode : MonoBehaviour
     BoundsInt buildingArea;
 
     public Sprite crackedWall;
+    Camera camera;
+    CinemachineSwitcher switcher;
+    public GameObject defaultBlock;
 
     private void Start()
     {
+        camera = Camera.main;
         blueprintMode = FindObjectOfType<BlueprintMode>();
+        switcher = camera.GetComponent<CinemachineSwitcher>();
     }
 
     public void StartBuildMode()
     {
+        switcher.SwitchState("Blueprint");
+        StartCoroutine(BuildModeStart(1));
+    }
+
+    /*IEnumerator WaitOnBlend()
+    {
+        yield return new WaitUntil(switcher.);
+        float waitDuration = switcher.GetBlendDuration();
+        StartCoroutine(BuildModeStart(waitDuration));
+    }*/
+
+    IEnumerator BuildModeStart(float waitDuration)
+    {
+        yield return new WaitUntil(() => switcher.DoneBlending());
+        print("START BUILD MODE");
         buildingArea = blueprintMode.GetCurrentBuildingBounds();
         print(buildingArea);
         //TileBase[] blueprintTiles = blueprintMode.GetCurrentBuildingTiles();
 
         Vector3 origin = buildingArea.position;
-        posOptionBtns = new GameObject[buildingArea.size.x , buildingArea.size.y];
+        posOptionBtns = new GameObject[buildingArea.size.x, buildingArea.size.y];
 
         for (int x = 0; x < buildingArea.size.x; x++)
         {
             for (int y = 0; y < buildingArea.size.y; y++)
             {
-                print(x + "," + y);
                 var block = Instantiate(posOptionBtnPrefab, placeBlockUI.transform);
                 Button button = block.GetComponent<Button>();
 
@@ -70,7 +89,7 @@ public class BuildMode : MonoBehaviour
 
                 Vector3 viewportPos = Camera.main.WorldToViewportPoint(worldPos);
                 rectTransform.anchoredPosition = new Vector2(1920 * viewportPos.x, 1080 * viewportPos.y);
-                
+
                 //block.transform.anchoredPosition = worldPos;
                 posOptionBtns[x, y] = block;
             }
@@ -152,6 +171,35 @@ public class BuildMode : MonoBehaviour
     {
         switch (state)
         {
+            case BuildState.PickBlock:
+                if (Input.GetKey(KeyCode.L))
+                {
+                    for (int x = 0; x < buildingArea.size.x; x++)
+                    {
+                        for (int y = 0; y < buildingArea.size.y; y++)
+                        {
+                            print(x + "," + y);
+
+                            if (!posOptionBtns[x, y])
+                                continue;
+
+                            conjuredBlock = Instantiate(defaultBlock, conjuringTransform);
+                            Destroy(posOptionBtns[x,y]);
+
+                            Vector3 origin = buildingArea.position;
+                            Vector3 worldPos = origin + new Vector3(x + 0.5f, y + 0.5f, 0);
+                            placingBlockEndPos = worldPos;
+                            
+                            conjuredBlock.transform.position = placingBlockEndPos;
+                        }
+                    }
+
+                    SwitchState(BuildState.None);
+                    blueprintMode.StartBlueprintMode();
+                    switcher.SwitchState("Blueprint");
+
+                }
+                break;
             case BuildState.Conjure:
                 conjureTimer += Time.fixedDeltaTime;
 
@@ -175,8 +223,9 @@ public class BuildMode : MonoBehaviour
                     if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
                     {
                         //GOTO Next phase
-                        state = BuildState.None;
+                        SwitchState(BuildState.None);
                         blueprintMode.StartBlueprintMode();
+                        switcher.SwitchState("Blueprint");
                     }
                     else
                         SwitchState(BuildState.PickBlock);

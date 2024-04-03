@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 public class BlueprintMode : MonoBehaviour
 {
     GridManager gridManager;
+    Camera camera;
 
     public GameObject blueprintUI;
 
@@ -16,6 +17,7 @@ public class BlueprintMode : MonoBehaviour
 
     private void Start()
     {
+        camera = Camera.main;
         gridManager = FindObjectOfType<GridManager>();
         buildMode = FindObjectOfType<BuildMode>();
     }
@@ -45,7 +47,13 @@ public class BlueprintMode : MonoBehaviour
 
     public void BuildingPlaced()
     {
+        CinemachineSwitcher switcher = camera.GetComponent<CinemachineSwitcher>();
+        switcher.SwitchState("Build");
+
         buildingArea = gridManager.GetBuildingArea();
+
+        switcher.BuildFollowTarget(building.transform);//buildingArea.center);
+
         buildMode.SwitchState(BuildState.PickBlock);
         buildMode.StartBuildMode();
     }
