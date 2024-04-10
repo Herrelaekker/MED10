@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
@@ -41,6 +42,9 @@ public class BuildMode : MonoBehaviour
     Camera camera;
     CinemachineSwitcher switcher;
     public GameObject defaultBlock;
+
+    [System.Serializable]
+    public class OnBuildStart : UnityEvent<> { }
 
     private void Start()
     {
