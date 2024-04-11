@@ -236,6 +236,7 @@ public class GameManager : MonoBehaviour
         if (gameState == GameState.Running) {
             if (inputWindow == InputWindowState.Closed) {
                 alarmFired = false;
+                print(interTrialTimer);
                 interTrialTimer += Time.deltaTime;
                 if (interTrialTimer > interTrialIntervalSeconds && currentTrial < trialsTotal) {
                     interTrialTimer = 0f;
@@ -296,7 +297,7 @@ public class GameManager : MonoBehaviour
 
     public void RunGame() {
         CalculateRecogRate();
-        gameState = GameState.Running;
+        //gameState = GameState.Running;
         GameData gameData = createGameData();
         onGameStateChanged.Invoke(gameData);
         LogEvent("GameRunning");
@@ -347,7 +348,7 @@ public class GameManager : MonoBehaviour
     public void CloseInputWindow() {
         // update the window state.
         inputWindow = InputWindowState.Closed;
-        interTrialTimer -= (inputWindowSeconds - inputWindowTimer);
+        interTrialTimer = 0; //-= (inputWindowSeconds - inputWindowTimer);
         inputWindowTimer = 0f;
         onInputWindowChanged.Invoke(inputWindow);
         LogEvent("InputWindowChange");
