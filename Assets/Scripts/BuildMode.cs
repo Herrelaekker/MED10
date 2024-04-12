@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
@@ -42,6 +43,10 @@ public class BuildMode : MonoBehaviour
     CinemachineSwitcher switcher;
     public GameObject defaultBlock;
 
+    [System.Serializable]
+    public class OnBuildStart : UnityEvent{ }
+    public OnBuildStart onBuildStart;
+
     private void Start()
     {
         camera = Camera.main;
@@ -65,6 +70,7 @@ public class BuildMode : MonoBehaviour
     IEnumerator BuildModeStart(float waitDuration)
     {
         yield return new WaitUntil(() => switcher.DoneBlending());
+        onBuildStart.Invoke();
         print("START BUILD MODE");
         buildingArea = blueprintMode.GetCurrentBuildingBounds();
         print(buildingArea);
@@ -201,7 +207,7 @@ public class BuildMode : MonoBehaviour
                 }
                 break;
             case BuildState.Conjure:
-                conjureTimer += Time.fixedDeltaTime;
+                /*conjureTimer += Time.fixedDeltaTime;
 
                 if (Input.GetKey(KeyCode.A))
                 {
@@ -210,7 +216,7 @@ public class BuildMode : MonoBehaviour
                 else if (conjureTimer >= conjureTime)
                 {
                     ConjureStone(false);
-                }
+                }*/
                 break;
             case BuildState.BlockPlaceTransition:
                 placingTimer += Time.fixedDeltaTime;
@@ -247,11 +253,11 @@ public class BuildMode : MonoBehaviour
         SwitchState(BuildState.BlockPlaceTransition);
     }
 
-    void ConjureStone(bool correctlyConjured)
+    public void ConjureStone(GameDecisionData decisionData)//bool correctlyConjured)
     {
         conjureTimer = 0;
         conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
-        if (!correctlyConjured || Random.Range(1,101) > 80)
+        if (decisionData.decision != TrialType.AccInput && decisionData.decision != TrialType.FabInput)
             conjuredBlock.GetComponent<SpriteRenderer>().sprite = crackedWall;
         SwitchState(BuildState.PlaceBlock);
     }
