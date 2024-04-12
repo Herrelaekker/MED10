@@ -159,7 +159,7 @@ ScriptedImporter:
     spritePosition: {x: 2531, y: 3408}
   - name: Layer 15
     originalName: 
-    pivot: {x: 0.42487445, y: 0.20647138}
+    pivot: {x: 0.54477656, y: 0.041839138}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:

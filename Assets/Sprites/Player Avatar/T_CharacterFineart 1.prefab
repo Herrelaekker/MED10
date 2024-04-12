@@ -111,12 +111,12 @@ Transform:
   m_GameObject: {fileID: 511084853706077591}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.42451775, y: 1.1924665, z: 0}
+  m_LocalPosition: {x: 0.06401786, y: 2.5169666, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5765102036539027059}
-  m_Father: {fileID: 7478467941580855619}
+  m_Father: {fileID: 7638807588027161060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2728703123335402281
 SpriteRenderer:
@@ -350,7 +350,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7638807588027161060}
-  - component: {fileID: 2392734758138500650}
   m_Layer: 0
   m_Name: T_CharacterFineart 1
   m_TagString: Untagged
@@ -376,32 +375,12 @@ Transform:
   - {fileID: 1945080548519457139}
   - {fileID: 2632686927481624553}
   - {fileID: 8735640800909133178}
+  - {fileID: 8374530244481432089}
   - {fileID: 7478467941580855619}
   - {fileID: 852734774416782184}
   - {fileID: 6111666381418467529}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &2392734758138500650
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 714924865786471210}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 36c227b34e4c8fb468d50efb41d4e849, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &953745535589741434
 GameObject:
   m_ObjectHideFlags: 0
@@ -413,7 +392,7 @@ GameObject:
   - component: {fileID: 1025348772196437307}
   - component: {fileID: 8638050318713803354}
   m_Layer: 0
-  m_Name: Layer 44
+  m_Name: Dressm4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -846,7 +825,7 @@ GameObject:
   - component: {fileID: 628421798267236208}
   - component: {fileID: 7809691882557723176}
   m_Layer: 0
-  m_Name: Layer 47
+  m_Name: Dressm5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1358,7 +1337,7 @@ GameObject:
   - component: {fileID: 1945080548519457139}
   - component: {fileID: 367664090045763185}
   m_Layer: 0
-  m_Name: Layer 41
+  m_Name: Dressm3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1700,7 +1679,7 @@ GameObject:
   - component: {fileID: 2632686927481624553}
   - component: {fileID: 6957922235391819222}
   m_Layer: 0
-  m_Name: Layer 46
+  m_Name: Dressm2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1784,7 +1763,7 @@ GameObject:
   - component: {fileID: 7478467941580855619}
   - component: {fileID: 6344412861508992448}
   m_Layer: 0
-  m_Name: dress
+  m_Name: dress Rest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1802,8 +1781,7 @@ Transform:
   m_LocalPosition: {x: -0.36049998, y: 1.3245001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8374530244481432089}
+  m_Children: []
   m_Father: {fileID: 7638807588027161060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6344412861508992448
@@ -1870,7 +1848,7 @@ GameObject:
   - component: {fileID: 8735640800909133178}
   - component: {fileID: 113374498670989314}
   m_Layer: 0
-  m_Name: Layer 45
+  m_Name: Dressm1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
