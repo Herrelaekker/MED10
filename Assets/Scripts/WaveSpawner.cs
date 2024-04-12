@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using TMPro;
 
 public class WaveSpawner : MonoBehaviour
 {
@@ -10,14 +12,63 @@ public class WaveSpawner : MonoBehaviour
     public Lane[] lanes;
     public GameObject enemyPrefab;
 
+    bool isActive;
+
+    public int maxDeathAmount = 15;
+
+    BattleMode battleMode;
+
+    int deathAmount = 0;
+
+    int enemySpawnCounter =0;
+
+    [System.Serializable]
+    public class OnEnemiesKilled : UnityEvent<int> { }
+    public OnEnemiesKilled onEnemiesKilled;
+
+    private void Start()
+    {
+        battleMode = FindObjectOfType<BattleMode>();
+    }
+
     private void FixedUpdate()
     {
-        timer += Time.fixedDeltaTime;
-        if (timeBeforeSpawning <= timer)
+        if (isActive)
         {
-            timer = 0;
-            SpawnEnemyInLane();
+            if (enemySpawnCounter < maxDeathAmount)
+            {
+                timer += Time.fixedDeltaTime;
+                if (timeBeforeSpawning <= timer)
+                {
+                    timer = 0;
+                    SpawnEnemyInLane();
+                    enemySpawnCounter++;
+                }
+            }
         }
+    }
+
+    public void EnemiesKilled(int amount)
+    {
+        deathAmount += amount;
+        onEnemiesKilled.Invoke(amount);
+        if (deathAmount >= maxDeathAmount)
+        {
+            deathAmount = 0;
+            battleMode.EndBattle();
+        }
+    }
+
+    public void StartSpawning()
+    {
+        isActive = true;
+        timer = 0;
+        enemySpawnCounter = 0;
+    }
+
+    public void StopSpawning()
+    {
+        isActive = false;
     }
 
     void SpawnEnemyInLane()

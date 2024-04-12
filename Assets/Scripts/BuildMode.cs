@@ -43,9 +43,20 @@ public class BuildMode : MonoBehaviour
     CinemachineSwitcher switcher;
     public GameObject defaultBlock;
 
+    public Sprite[] merlons;
+    public GameObject merlonPrefab;
+
     [System.Serializable]
     public class OnBuildStart : UnityEvent{ }
     public OnBuildStart onBuildStart;
+
+    [System.Serializable]
+    public class OnBuildEnd : UnityEvent { }
+    public OnBuildEnd onBuildEnd;
+
+    [System.Serializable]
+    public class OnBlockConjured : UnityEvent { }
+    public OnBlockConjured onBlockConjured;
 
     private void Start()
     {
@@ -173,6 +184,50 @@ public class BuildMode : MonoBehaviour
         SwitchState(BuildState.PickBlock);
     }
 
+    void AddMerlons()
+    {
+        Vector3 origin = buildingArea.position;
+        int iterations = buildingArea.size.x;
+        for (int x = 0; x < iterations; x++)
+        {
+            var merlon = Instantiate(merlonPrefab);
+
+            Sprite merlonSprite;
+            Vector3 worldPos;
+            if (x == 0)
+            {
+                merlonSprite = merlons[0];
+                worldPos = origin + new Vector3(x + 0.435f, buildingArea.size.y + 0.15f, 0);
+            }
+            else if (x == iterations - 1)
+            {
+                merlonSprite = merlons[2];
+                worldPos = origin + new Vector3(x + 0.565f, buildingArea.size.y + 0.15f, 0);
+            }
+            else
+            {
+                merlonSprite = merlons[1];
+                worldPos = origin + new Vector3(x + 0.5f, buildingArea.size.y + 0.15f, 0);
+            }
+
+
+            SpriteRenderer merlonSR = merlon.GetComponent<SpriteRenderer>();
+            merlonSR.sprite = merlonSprite;
+            merlonSR.sortingOrder = 4;
+            merlon.transform.position = worldPos;
+        }
+    }
+
+    void DoneBuilding()
+    {
+        AddMerlons();
+
+        SwitchState(BuildState.None);
+        onBuildEnd.Invoke();
+        //blueprintMode.StartBlueprintMode();
+        //switcher.SwitchState("Blueprint");
+    }
+
     private void FixedUpdate()
     {
         switch (state)
@@ -190,6 +245,8 @@ public class BuildMode : MonoBehaviour
                                 continue;
 
                             conjuredBlock = Instantiate(defaultBlock, conjuringTransform);
+                            conjuredBlock.transform.parent = null;
+
                             Destroy(posOptionBtns[x,y]);
 
                             Vector3 origin = buildingArea.position;
@@ -197,12 +254,11 @@ public class BuildMode : MonoBehaviour
                             placingBlockEndPos = worldPos;
                             
                             conjuredBlock.transform.position = placingBlockEndPos;
+                            onBlockConjured.Invoke();
                         }
                     }
 
-                    SwitchState(BuildState.None);
-                    blueprintMode.StartBlueprintMode();
-                    switcher.SwitchState("Blueprint");
+                    DoneBuilding();
 
                 }
                 break;
@@ -229,9 +285,7 @@ public class BuildMode : MonoBehaviour
                     if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
                     {
                         //GOTO Next phase
-                        SwitchState(BuildState.None);
-                        blueprintMode.StartBlueprintMode();
-                        switcher.SwitchState("Blueprint");
+                        DoneBuilding();
                     }
                     else
                         SwitchState(BuildState.PickBlock);
@@ -257,8 +311,12 @@ public class BuildMode : MonoBehaviour
     {
         conjureTimer = 0;
         conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
+        conjuredBlock.transform.parent = null;
+
+        SpriteRenderer spriteRend = conjuredBlock.GetComponent<SpriteRenderer>();
         if (decisionData.decision != TrialType.AccInput && decisionData.decision != TrialType.FabInput)
-            conjuredBlock.GetComponent<SpriteRenderer>().sprite = crackedWall;
+            spriteRend.sprite = crackedWall;
         SwitchState(BuildState.PlaceBlock);
+        onBlockConjured.Invoke();
     }
 }

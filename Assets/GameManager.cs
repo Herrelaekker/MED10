@@ -236,7 +236,6 @@ public class GameManager : MonoBehaviour
         if (gameState == GameState.Running) {
             if (inputWindow == InputWindowState.Closed) {
                 alarmFired = false;
-                print(interTrialTimer);
                 interTrialTimer += Time.deltaTime;
                 if (interTrialTimer > interTrialIntervalSeconds && currentTrial < trialsTotal) {
                     interTrialTimer = 0f;

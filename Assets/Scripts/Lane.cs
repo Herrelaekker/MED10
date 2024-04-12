@@ -9,6 +9,12 @@ public class Lane : MonoBehaviour
 
     List<GameObject> enemies = new List<GameObject>();
 
+    WaveSpawner waveSpawner;
+    private void Start()
+    {
+        waveSpawner = FindObjectOfType<WaveSpawner>();
+    }
+
     private void OnMouseDown()
     {
         DestroyAllEnemies();
@@ -16,6 +22,8 @@ public class Lane : MonoBehaviour
 
     void DestroyAllEnemies()
     {
+        waveSpawner.EnemiesKilled(enemies.Count);
+
         foreach(GameObject go in enemies)
         {
             Destroy(go);
