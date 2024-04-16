@@ -97,4 +97,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2ce48770c8ed8429fdd6c85d51a25c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeBeforeReachingGoal: 5
+  timeBeforeReachingGoal: 10

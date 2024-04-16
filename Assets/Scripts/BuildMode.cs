@@ -46,6 +46,8 @@ public class BuildMode : MonoBehaviour
     public Sprite[] merlons;
     public GameObject merlonPrefab;
 
+    public Animator playerCharAnimator;
+
     [System.Serializable]
     public class OnBuildStart : UnityEvent{ }
     public OnBuildStart onBuildStart;
@@ -136,10 +138,20 @@ public class BuildMode : MonoBehaviour
 
         switch (state)
         {
+            case BuildState.Conjure:
+                playerCharAnimator.SetBool("PickedBlock", true);
+                break;
+            case BuildState.BlockPlaceTransition:
+                playerCharAnimator.SetBool("PickedPlacement", true);
+                break;
             case BuildState.PickBlock:
+                playerCharAnimator.SetBool("PickedPlacement", false);
+
                 pickBlockUI.SetActive(true);
                 break;
             case BuildState.PlaceBlock:
+                playerCharAnimator.SetBool("PickedBlock", false);
+
                 placeBlockUI.SetActive(true);
                 int rowWithBtns = 0;
                 bool rowChosen = false;

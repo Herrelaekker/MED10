@@ -95,6 +95,8 @@ public class SimBCIInput : MonoBehaviour
 
     private LoggingManager loggingManager;
 
+    ContinuousFeedback continuousFeedback;
+
     void Start()
     {
         if (instance == null) {
@@ -115,6 +117,8 @@ public class SimBCIInput : MonoBehaviour
         correctConfArray = correctBCIInput.text.Split('\n');
         maxCorrectConfPosition = correctConfArray.Length-1;
         correctConfPosition = 0;
+
+        continuousFeedback = FindObjectOfType<ContinuousFeedback>();
     }
 
     private void LogMeta() {
@@ -208,6 +212,7 @@ public class SimBCIInput : MonoBehaviour
        // Update() runs faster (1/60) than our input data (1/16) arrives.
        // The code below is only run whenever a new value comes in from the BCI side.
        LogSample("Sample");
+       continuousFeedback.SetConfidence(confidence);
        InputData inputData = new InputData();
        inputData.confidence = confidence;
        inputData.type = InputType.MotorImagery;

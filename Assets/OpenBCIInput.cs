@@ -115,6 +115,8 @@ public class OpenBCIInput : MonoBehaviour
 
     private LoggingManager loggingManager;
 
+    ContinuousFeedback continuousFeedback;
+
     void Start()
     {
         if (instance == null) {
@@ -129,6 +131,8 @@ public class OpenBCIInput : MonoBehaviour
         onBCIStateChanged.Invoke(Enum.GetName(typeof(BCIState), bciState), "");
         StartCoroutine("ConnectToBCI");
         inputNumber = 0;
+
+        continuousFeedback = FindObjectOfType<ContinuousFeedback>();
     }
 
     private void LogMeta() {
@@ -188,6 +192,7 @@ public class OpenBCIInput : MonoBehaviour
        // Update() runs faster (1/60) than our input data (1/16) arrives.
        // The code below is only run whenever a new value comes in from the BCI side.
        LogSample("Sample");
+       continuousFeedback.SetConfidence(confidence);
        InputData inputData = new InputData();
        inputData.confidence = 1 - confidence;
        inputData.type = InputType.MotorImagery;
