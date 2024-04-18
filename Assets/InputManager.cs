@@ -7,6 +7,7 @@ public class InputData {
     public InputType type;
     public float confidence;
     public int inputNumber;
+    public MotorImageryEvent classification;
 }
 
 public enum InputValidity {

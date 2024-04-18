@@ -26,6 +26,7 @@ public class Mechanism {
 
 public class GameDecisionData {
     public TrialType decision;
+    public MotorImageryEvent classification;
     public float currentFabAlarm;
 }
 
@@ -82,6 +83,7 @@ public class GameManager : MonoBehaviour
     private float currentFabAlarm = 0f;
     private bool alarmFired = false;
     private int fabInputNumber = 0;
+    private MotorImageryEvent classification;
 
 
     [Header("InputWindow Settings")]
@@ -114,6 +116,8 @@ public class GameManager : MonoBehaviour
 
     private LoggingManager loggingManager;
     private UrnModel urn;
+
+    InputData bestInputData = null;
 
     void Start()
     {
@@ -262,7 +266,9 @@ public class GameManager : MonoBehaviour
                 } else if (inputWindowTimer > inputWindowSeconds) {
                    //Debug.Log("inputWindow expired.");
                     // The input window expired
-                    MakeInputDecision(null, true);
+                    MakeInputDecision(bestInputData, true);
+                    bestInputData = null;
+                    curClassification = MotorImageryEvent.Rest;
                     alarmFired = false;
                 }
             }
@@ -335,12 +341,20 @@ public class GameManager : MonoBehaviour
         currentTrial = urn.GetIndex();
     }
 
+    MotorImageryEvent curClassification;
     public void OnInputReceived(InputData inputData) {
+        if (bestInputData != null)
+            if (bestInputData.classification == MotorImageryEvent.GoldenMotorImagery)
+                return;
+        curClassification = inputData.classification;
+
         if (inputWindow == InputWindowState.Closed) {
             // ignore the input.
             return;
         } else {
-            MakeInputDecision(inputData);
+            if (inputData.classification == MotorImageryEvent.MotorImagery || inputData.classification == MotorImageryEvent.GoldenMotorImagery)
+                bestInputData = inputData;
+            //MakeInputDecision(inputData);
         }
     }
 
@@ -360,6 +374,7 @@ public class GameManager : MonoBehaviour
         GameDecisionData gameDecisionData = new GameDecisionData();
         gameDecisionData.currentFabAlarm = currentFabAlarm;
         gameDecisionData.decision = trialResult;
+        gameDecisionData.classification = classification;
         gameDecision.Invoke(gameDecisionData);
         LogEvent("GameDecision");
        ////Debug.Log("designedInputOrder: " + designedInputOrder.Count);
@@ -373,39 +388,63 @@ public class GameManager : MonoBehaviour
         string entry = urn.ReadEntry();
         trialGoal = (TrialType) System.Enum.Parse(typeof(TrialType), entry);
         trialResult = TrialType.RejInput;
-        
-        if (inputData != null) {
-            if (inputData.type == InputType.FabInput) {
-                if (trialGoal == TrialType.FabInput) {
+
+
+        if (inputData != null)
+        {
+            classification = inputData.classification;
+
+            if (inputData.type == InputType.FabInput)
+            {
+                if (trialGoal == TrialType.FabInput)
+                {
                     trialResult = TrialType.FabInput;
                     CloseInputWindow();
-                } else if (trialGoal == TrialType.ExplicitSham) {
+                }
+                else if (trialGoal == TrialType.ExplicitSham)
+                {
                     trialResult = TrialType.ExplicitSham;
                     CloseInputWindow();
                 }
-            } else if (trialGoal == TrialType.AccInput) {
-                if (inputData.validity == InputValidity.Accepted) {
+            }
+            else if (trialGoal == TrialType.AccInput)
+            {
+                if (inputData.validity == InputValidity.Accepted)
+                {
                     trialResult = TrialType.AccInput;
                     CloseInputWindow();
-                } else {
+                }
+                else
+                {
                     trialResult = TrialType.RejInput;
                 }
-            } else if (trialGoal == TrialType.RejInput) {
+            }
+            else if (trialGoal == TrialType.RejInput)
+            {
                 trialResult = TrialType.RejInput;
                 // ignore the input.
-            } else if (trialGoal == TrialType.AssistSuccess) {
-                if (inputData.validity == InputValidity.Accepted) {
+            }
+            else if (trialGoal == TrialType.AssistSuccess)
+            {
+                if (inputData.validity == InputValidity.Accepted)
+                {
                     trialResult = TrialType.AssistSuccess;
                     CloseInputWindow();
-                } else {
+                }
+                else
+                {
                     trialResult = TrialType.RejInput;
                 }
-            } else if (trialGoal == TrialType.AssistFail) {
+            }
+            else if (trialGoal == TrialType.AssistFail)
+            {
                 trialResult = TrialType.AssistFail;
                 // ignore the input.
             }
-        } else if (windowExpired) {
-                CloseInputWindow();
+        }
+        else if (windowExpired)
+        {
+            CloseInputWindow();
         }
     }
 
