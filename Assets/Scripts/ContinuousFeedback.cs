@@ -6,8 +6,8 @@ public class ContinuousFeedback : MonoBehaviour
 {
     float confidence = -1;
 
-    public ParticleSystem particles;
-    ParticleSystem.MainModule psMain;
+    public ParticleSystem[] particles;
+    ParticleSystem.MainModule[] psMains;
     bool isActive = true;
 
     float classficationThreshold;
@@ -30,7 +30,9 @@ public class ContinuousFeedback : MonoBehaviour
             }
         }
         print(classficationThreshold);
-        psMain = particles.main;
+        psMains = new ParticleSystem.MainModule[particles.Length];
+        for ( int i = 0; i < psMains.Length; i++)
+            psMains[i] = particles[i].main;
     }
 
     public void SetConfidence(float confidence)
@@ -53,10 +55,11 @@ public class ContinuousFeedback : MonoBehaviour
 
     void SetAlpha()
     {
-        Color col = Color.red;
+        Color col = Color.white;
         float t = confidence / classficationThreshold;
         float alphaVal = Mathf.Lerp(minAlpha, maxAlpha, t);
-        psMain.startColor = new Color(col.r, col.g, col.b, alphaVal);
+        for(int i = 0; i < psMains.Length; i++)
+            psMains[i].startColor = new Color(col.r, col.g, col.b, alphaVal);
     }
 
 }

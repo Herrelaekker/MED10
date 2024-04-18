@@ -21,8 +21,10 @@ public class SimBCIInput : MonoBehaviour
 
     private MotorImageryEvent classification = MotorImageryEvent.Rest;
     public float classificationThreshold = 0.7f;
+    public float classificationGoldenThreshold = 0.8f;
 
     private int[] consecThresholdBuffer;
+    private int[] consecGoldenThresholdBuffer;
     private float[] consecThresholdBufferVal;
     private int consecThresholdIndex = 0;
     public int  consecutiveBufferSize = 8;
@@ -104,6 +106,7 @@ public class SimBCIInput : MonoBehaviour
         }
         DontDestroyOnLoad(this);
         consecThresholdBuffer = new int[consecutiveBufferSize];
+        consecGoldenThresholdBuffer = new int[consecutiveBufferSize];
         consecThresholdBufferVal = new float[consecutiveBufferSize];
         bciState = BCIState.Disconnected;
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -184,7 +187,7 @@ public class SimBCIInput : MonoBehaviour
         } else if (Input.GetKeyUp(KeyCode.V)) {
             confPosition = UnityEngine.Random.Range(0,maxConfPosition);
             consecThresholdIndex = 0;
-            Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
+            //Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
             classification = MotorImageryEvent.Rest;
         } else if (Input.GetKey(KeyCode.C) && timer > waitTime) {
             timer = 0f;
@@ -199,7 +202,7 @@ public class SimBCIInput : MonoBehaviour
             Debug.Log("Clear");
             correctConfPosition = 0;
             consecThresholdIndex = 0;
-            Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
+            //Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
             classification = MotorImageryEvent.Rest;
         } else {
             confidence = -1f;
@@ -224,11 +227,12 @@ public class SimBCIInput : MonoBehaviour
            newClassification = ProcessConsecutiveThreshold(confidence);
        }
        if (newClassification != classification) {
-            if (newClassification == MotorImageryEvent.MotorImagery) {
+            if (newClassification == MotorImageryEvent.MotorImagery || newClassification == MotorImageryEvent.GoldenMotorImagery) {
                 inputData.validity = InputValidity.Accepted;
                 inputNumber++;
             }
-           Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
+            inputData.classification = newClassification;
+           //Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
            inputData.inputNumber = inputNumber;
            LogMotorImageryEvent(newClassification, confidence);
            Debug.Log("Motor Imagery!");
@@ -254,15 +258,28 @@ public class SimBCIInput : MonoBehaviour
         MotorImageryEvent newClassification = MotorImageryEvent.Rest;
 
         // If our confidence value is higher than the threshold, add a 1 to the buffer.
+        if (confidence > classificationGoldenThreshold)
+        {
+            consecGoldenThresholdBuffer[consecThresholdIndex] = 1;
+        }
+        else
+        {
+            consecGoldenThresholdBuffer[consecThresholdIndex] = 0;
+        }
+    
         if (confidence > classificationThreshold) {
             consecThresholdBuffer[consecThresholdIndex] = 1;
-            consecThresholdBufferVal[consecThresholdIndex] = confidence;
         } else {
             consecThresholdBuffer[consecThresholdIndex] = 0;
-            consecThresholdBufferVal[consecThresholdIndex] = confidence;
         }
+        consecThresholdBufferVal[consecThresholdIndex] = confidence;
+
         // if all positions in the buffer carry a 1, we have motor imagery.
-        if (consecThresholdBuffer.Sum() == consecutiveBufferSize) {
+        if (consecGoldenThresholdBuffer.Sum() == consecutiveBufferSize)
+        {
+            newClassification = MotorImageryEvent.GoldenMotorImagery;
+        }
+        else if (consecThresholdBuffer.Sum() == consecutiveBufferSize) {
             newClassification = MotorImageryEvent.MotorImagery;
         }
 

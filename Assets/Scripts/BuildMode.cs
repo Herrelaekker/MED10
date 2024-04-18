@@ -39,6 +39,7 @@ public class BuildMode : MonoBehaviour
     BoundsInt buildingArea;
 
     public Sprite crackedWall;
+    public Sprite goldenWall;
     Camera camera;
     CinemachineSwitcher switcher;
     public GameObject defaultBlock;
@@ -47,6 +48,9 @@ public class BuildMode : MonoBehaviour
     public GameObject merlonPrefab;
 
     public Animator playerCharAnimator;
+    public GameObject magicPE;
+    public GameObject magicBurstPE;
+    public GameObject magicTrailPE;
 
     [System.Serializable]
     public class OnBuildStart : UnityEvent{ }
@@ -187,6 +191,10 @@ public class BuildMode : MonoBehaviour
     public void PickedBlock(GameObject block)
     {
         pickedBlock = block;
+        magicPE.SetActive(true);
+        magicBurstPE.SetActive(false);
+        magicTrailPE.SetActive(false);
+
         SwitchState(BuildState.Conjure);
     }
 
@@ -294,6 +302,7 @@ public class BuildMode : MonoBehaviour
                 if (t >= 1)
                 {
                     placingTimer = 0;
+
                     if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
                     {
                         //GOTO Next phase
@@ -325,9 +334,17 @@ public class BuildMode : MonoBehaviour
         conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
         conjuredBlock.transform.parent = null;
 
+        magicPE.SetActive(false);
+        magicBurstPE.SetActive(true);
+        magicTrailPE.SetActive(true);
+        magicTrailPE.transform.parent = conjuredBlock.transform;
+        magicTrailPE.transform.localPosition = Vector3.zero;
+
         SpriteRenderer spriteRend = conjuredBlock.GetComponent<SpriteRenderer>();
         if (decisionData.decision != TrialType.AccInput && decisionData.decision != TrialType.FabInput)
             spriteRend.sprite = crackedWall;
+        else if (decisionData.classification == MotorImageryEvent.GoldenMotorImagery)
+            spriteRend.sprite = goldenWall;
         SwitchState(BuildState.PlaceBlock);
         onBlockConjured.Invoke();
     }
