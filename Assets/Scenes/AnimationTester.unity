@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -160,10 +160,14 @@ MonoBehaviour:
   posOptionBtnPrefab: {fileID: 2999547512229102697, guid: 38c2bf0998dc4144f98412be7ea557f3,
     type: 3}
   crackedWall: {fileID: 0}
+  goldenWall: {fileID: 0}
   defaultBlock: {fileID: 0}
   merlons: []
   merlonPrefab: {fileID: 0}
   playerCharAnimator: {fileID: 0}
+  magicPE: {fileID: 0}
+  magicBurstPE: {fileID: 0}
+  magicTrailPE: {fileID: 0}
   onBuildStart:
     m_PersistentCalls:
       m_Calls: []
@@ -396,7 +400,7 @@ Transform:
   m_GameObject: {fileID: 95378614}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.11, y: 2.28, z: 0}
+  m_LocalPosition: {x: -2.13, y: -0.45, z: 0}
   m_LocalScale: {x: 0.32825, y: 0.32825, z: 0.32825}
   m_ConstrainProportionsScale: 0
   m_Children:

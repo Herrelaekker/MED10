@@ -36,7 +36,7 @@ public class Lane : MonoBehaviour
         var enemyObjInstance = Instantiate(enemyObj, startTrans);
         enemies.Add(enemyObjInstance);
         Enemy enemy = enemyObjInstance.GetComponent<Enemy>();
-        enemy.SetWayPoints(startTrans, endTrans);
+        //enemy.SetWayPoints(startTrans, endTrans);
     }
 
 
