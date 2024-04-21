@@ -26,8 +26,6 @@ public class GridManager : MonoBehaviour
 
     private Dictionary<TileType, TileBase> tileBases = new Dictionary<TileType, TileBase>();
 
-    BlueprintMode blueprintMode;
-
     BoundsInt recentlyClaimedArea;
 
     // Start is called before the first frame update
@@ -39,7 +37,6 @@ public class GridManager : MonoBehaviour
         tileBases.Add(TileType.Red, Resources.Load<TileBase>(tilePath + "red"));
         tileBases.Add(TileType.Green, Resources.Load<TileBase>(tilePath + "green"));
         tileBases.Add(TileType.Blue, Resources.Load<TileBase>(tilePath + "blue"));
-        blueprintMode = FindObjectOfType<BlueprintMode>();
     }
 
     private void ClearArea()

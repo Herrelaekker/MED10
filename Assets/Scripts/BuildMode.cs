@@ -31,7 +31,6 @@ public class BuildMode : MonoBehaviour
     Vector3 placingBlockEndPos;
 
     public Transform conjuringTransform;
-    BlueprintMode blueprintMode;
 
     public GameObject posOptionBtnPrefab;
 
@@ -67,7 +66,6 @@ public class BuildMode : MonoBehaviour
     private void Start()
     {
         camera = Camera.main;
-        blueprintMode = FindObjectOfType<BlueprintMode>();
         switcher = camera.GetComponent<CinemachineSwitcher>();
     }
 

@@ -6,7 +6,6 @@ using TMPro;
 public class PhaseManager : MonoBehaviour
 {
     BuildMode buildMode;
-    BlueprintMode blueprintMode;
     BattleMode battleMode;
     CinemachineSwitcher switcher;
 
@@ -16,7 +15,6 @@ public class PhaseManager : MonoBehaviour
     private void Start()
     {
         buildMode = FindObjectOfType<BuildMode>();
-        blueprintMode = FindObjectOfType<BlueprintMode>();
         battleMode = FindObjectOfType<BattleMode>();
         switcher = Camera.main.GetComponent<CinemachineSwitcher>();
 
@@ -34,11 +32,6 @@ public class PhaseManager : MonoBehaviour
         GoToBlueprintMode();
     }
 
-    void GoToBlueprintMode()
-    {
-        blueprintMode.StartBlueprintMode();
-        switcher.SwitchState("Blueprint");
-    }
     void GoToBattleMode()
     {
         battleMode.StartBattle();
