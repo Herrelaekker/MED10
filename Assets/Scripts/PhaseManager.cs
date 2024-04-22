@@ -18,7 +18,8 @@ public class PhaseManager : MonoBehaviour
         battleMode = FindObjectOfType<BattleMode>();
         switcher = Camera.main.GetComponent<CinemachineSwitcher>();
 
-        GoToBattleMode();
+        //GoToBattleMode();
+        GoToBuildMode();
     }
 
     public void BuildModeEnded()
@@ -29,7 +30,7 @@ public class PhaseManager : MonoBehaviour
 
     public void BattleModeEnded()
     {
-        GoToBlueprintMode();
+        GoToBuildMode();
     }
 
     void GoToBattleMode()

@@ -51,6 +51,7 @@ public class GridManager : MonoBehaviour
         int size = area.size.x * area.size.y * area.size.z;
         TileBase[] tileArray = new TileBase[size];
         FillTiles(tileArray, type);
+
         tilemap.SetTilesBlock(area, tileArray);
     }
 
@@ -174,7 +175,7 @@ public class GridManager : MonoBehaviour
     public bool CanTakeArea(BoundsInt area)
     {
         TileBase[] baseArray = GetTilesBlock(area, mainTilemap);
-        TileBase[] bottomArray = GetBottomTiles(area, mainTilemap);
+        //TileBase[] bottomArray = GetBottomTiles(area, mainTilemap);
         foreach(var b in baseArray)
         {
             if (b != tileBases[TileType.White] && b != tileBases[TileType.Blue])
@@ -182,11 +183,11 @@ public class GridManager : MonoBehaviour
                 return false;
             }
         }
-        foreach(var b in bottomArray)
+        /*foreach(var b in bottomArray)
         {
             if (b != tileBases[TileType.Blue])
                 return false;
-        }
+        }*/
         return true;
     }
 
@@ -198,6 +199,36 @@ public class GridManager : MonoBehaviour
     public BoundsInt GetBuildingArea()
     {
         return recentlyClaimedArea;
+    }
+
+    public void TakeDecorationArea(BoundsInt area)
+    {
+        print("Placed decoration");
+        recentlyClaimedArea = area;
+        SetTilesBlock(area, TileType.Red, mainTilemap);
+    }
+
+    public void TakeBlockArea(BoundsInt area)
+    {
+        print("Place block");
+        recentlyClaimedArea = area;
+        BoundsInt areaAboveBuilding = new BoundsInt(new Vector3Int(area.xMin, area.yMax, 0), new Vector3Int(area.xMax - area.xMin, 1, 1));
+        BoundsInt areaLeft = new BoundsInt(new Vector3Int(area.xMin - 1, area.yMin, 0), new Vector3Int(1, area.yMax - area.yMin, 1));
+        BoundsInt areaRight = new BoundsInt(new Vector3Int(area.xMax, area.yMin, 0), new Vector3Int(1, area.yMax - area.yMin, 1));
+        SetTilesBlock(area, TileType.Empty, tempTilemap);
+        SetTilesBlock(area, TileType.Green, mainTilemap);
+        if (CanTakeArea(areaAboveBuilding))
+        {
+            SetTilesBlock(areaAboveBuilding, TileType.Blue, mainTilemap);
+        }
+        if (CanTakeArea(areaLeft))
+        {
+            SetTilesBlock(areaLeft, TileType.Blue, mainTilemap);
+        }
+        if (CanTakeArea(areaRight))
+        {
+            SetTilesBlock(areaRight, TileType.Blue, mainTilemap);
+        }
     }
 
     public void TakeArea(BoundsInt area)
@@ -229,14 +260,15 @@ public class GridManager : MonoBehaviour
             FollowBuilding();
         }
 
-        if (Input.GetMouseButtonDown(0))
+        /*if (Input.GetMouseButtonDown(0))
         {
             if (temp.CanBePlaced())
             {
                 temp.Place();
                 temp = null;
-                blueprintMode.BuildingPlaced();
+                buildMode
+                //blueprintMode.BuildingPlaced();
             }
-        }
+        }*/
     }
 }
