@@ -12,14 +12,18 @@ public class PhaseManager : MonoBehaviour
     private int mana;
     public TMP_Text manaText;
 
+    public Animator bgAnimator;
+    MagicAttack magicAttack;
+
     private void Start()
     {
         buildMode = FindObjectOfType<BuildMode>();
         battleMode = FindObjectOfType<BattleMode>();
         switcher = Camera.main.GetComponent<CinemachineSwitcher>();
+        magicAttack = FindObjectOfType<MagicAttack>();    
 
-        //GoToBattleMode();
-        GoToBuildMode();
+        GoToBattleMode();
+        //GoToBuildMode();
     }
 
     public void BuildModeEnded()
@@ -33,14 +37,25 @@ public class PhaseManager : MonoBehaviour
         GoToBuildMode();
     }
 
-    void GoToBattleMode()
+    public void BattleTransitionDone()
     {
         battleMode.StartBattle();
         switcher.SwitchState("Battle");
+        magicAttack.EnableMagicAttack();
+    }
+    public void BuildTransitionDone()
+    {
+        buildMode.StartBuildMode();
+        magicAttack.DisableMagicAttack();
+    }
+
+    void GoToBattleMode()
+    {
+        bgAnimator.SetInteger("Phase", 2);
     }
     void GoToBuildMode()
     {
-        buildMode.StartBuildMode();
+        bgAnimator.SetInteger("Phase", 1);
         switcher.SwitchState("Build");
     }
 

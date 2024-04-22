@@ -52,6 +52,8 @@ public class WaveSpawner : MonoBehaviour
 
     public Vector2 GetYRange()
     {
+        maxTowerY = towerRangeTrans1.position.y;
+        minSpawnY = spawnRangeTrans1.position.y;
         return new Vector2(minSpawnY, maxTowerY);
     }
 

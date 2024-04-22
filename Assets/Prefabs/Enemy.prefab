@@ -132,8 +132,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeBeforeReachingGoal: 10
-  minScale: 0.5
-  maxScale: 1.5
+  minScale: 1
+  maxScale: 2
   health: 3
 --- !u!61 &3114597165637202812
 BoxCollider2D:

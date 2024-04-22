@@ -15,6 +15,8 @@ public class MagicAttack : MonoBehaviour
     Collider2D col;
     SpriteRenderer sr;
 
+    bool enabled = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +25,7 @@ public class MagicAttack : MonoBehaviour
         col = attackCursor.GetComponentInChildren<Collider2D>();
         sr = attackCursor.GetComponentInChildren<SpriteRenderer>();
         sr.sortingOrder = 10;
+        attackCursor.SetActive(false);
     }
 
     Vector3 GetScale(float yPos)
@@ -54,9 +57,22 @@ public class MagicAttack : MonoBehaviour
         followMouse = true;
     }
 
+    public void EnableMagicAttack()
+    {
+        bounds = waveSpawner.GetYRange();
+        enabled = true;
+    }
+    public void DisableMagicAttack()
+    {
+        enabled = false;
+        sr.enabled = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
+        if (!enabled) return;
+
         if (Input.GetMouseButtonDown(0))
         {
             followMouse = false;

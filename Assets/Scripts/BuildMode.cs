@@ -155,20 +155,6 @@ public class BuildMode : MonoBehaviour
         }
     }
 
-    private bool IsArrayEmpty(GameObject[,] essenceArray, int row, int col)
-    {
-        if (essenceArray == null || essenceArray.Length == 0) return true;
-        for (int i = 0; i < row; i++)
-        for (int j = 0; j < col; j++)
-        {
-            if (essenceArray[i,j] != null)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public void SwitchState(BuildState newState)
     {
         state = newState;
@@ -192,14 +178,14 @@ public class BuildMode : MonoBehaviour
                 break;
             case BuildState.PlaceBlock:
                 playerCharAnimator.SetBool("PickedBlock", false);
-
+                Sprite sprite = conjuredBlock.GetComponent<SpriteRenderer>().sprite;
                 switch (curPlacementType)
                 {
                     case PlacementType.Block:
-                        ShowPositions(posOptionBtns);
+                        ShowPositions(posOptionBtns, sprite);
                         break;
                     case PlacementType.Decoration:
-                        ShowPositions(posDecorationBtns);
+                        ShowPositions(posDecorationBtns, sprite);
                         break;
                 }
 
@@ -208,14 +194,14 @@ public class BuildMode : MonoBehaviour
         }
     }
 
-    public void ShowBlockPositions()
+    public void ShowBlockPositions(Sprite sprite)
     {
-        ShowPositions(posOptionBtns);
+        ShowPositions(posOptionBtns, sprite);
         print("show blocks");
     }
-    public void ShowDecorationPositions()
+    public void ShowDecorationPositions(Sprite sprite)
     {
-        ShowPositions(posDecorationBtns);
+        ShowPositions(posDecorationBtns, sprite);
 
         print("show decorations");
     }
@@ -240,7 +226,7 @@ public class BuildMode : MonoBehaviour
         }
     }
 
-    void ShowPositions(GameObject[,] posOptions)
+    void ShowPositions(GameObject[,] posOptions, Sprite sprite)
     {
         HidePositons();
         placeBlockUI.SetActive(true );
@@ -251,6 +237,7 @@ public class BuildMode : MonoBehaviour
                 if (posOptions[x, y] != null)
                 {
                     posOptions[x, y].SetActive(true);
+                    posOptions[x, y].GetComponent<Image>().sprite = sprite;
                 }
             }
         }
@@ -283,50 +270,6 @@ public class BuildMode : MonoBehaviour
     {
         //Place Block somehow
         SwitchState(BuildState.PickBlock);
-    }
-
-    void AddMerlons()
-    {
-        Vector3 origin = buildingArea.position;
-        int iterations = buildingArea.size.x;
-        for (int x = 0; x < iterations; x++)
-        {
-            var merlon = Instantiate(merlonPrefab);
-
-            Sprite merlonSprite;
-            Vector3 worldPos;
-            if (x == 0)
-            {
-                merlonSprite = merlons[0];
-                worldPos = origin + new Vector3(x + 0.435f, buildingArea.size.y + 0.15f, 0);
-            }
-            else if (x == iterations - 1)
-            {
-                merlonSprite = merlons[2];
-                worldPos = origin + new Vector3(x + 0.565f, buildingArea.size.y + 0.15f, 0);
-            }
-            else
-            {
-                merlonSprite = merlons[1];
-                worldPos = origin + new Vector3(x + 0.5f, buildingArea.size.y + 0.15f, 0);
-            }
-
-
-            SpriteRenderer merlonSR = merlon.GetComponent<SpriteRenderer>();
-            merlonSR.sprite = merlonSprite;
-            merlonSR.sortingOrder = 4;
-            merlon.transform.position = worldPos;
-        }
-    }
-
-    void DoneBuilding()
-    {
-        AddMerlons();
-
-        SwitchState(BuildState.None);
-        onBuildEnd.Invoke();
-        //blueprintMode.StartBlueprintMode();
-        //switcher.SwitchState("Blueprint");
     }
 
     private void FixedUpdate()
