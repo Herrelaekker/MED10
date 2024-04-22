@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 31dfb95479465be4f928275a9a2372c4
+guid: 7436ab76e83d6e34eac954079a4f3227
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -69,7 +69,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -110,13 +110,76 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Star_Idle_0
+      name: dust_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1021
+        width: 1000
+        height: 1021
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ef7baa0e5e72c04a9b3f359386fab72
+      internalID: -972037742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dust_1
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 1021
+        width: 1000
+        height: 1021
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbdda07e1f30e5942bf49ae5bd0e91c1
+      internalID: 310228975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dust_2
+      rect:
+        serializedVersion: 2
+        x: 2000
+        y: 1021
+        width: 1000
+        height: 1021
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a3ce5182084eb243b054929d8b1f499
+      internalID: -889522290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dust_3
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 472
-        height: 472
+        width: 1000
+        height: 1021
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +187,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: add763fc3283a6140bd49717c155ad1c
-      internalID: 2048225141
+      spriteID: ea5ba850888cdc24ab657caf6da85012
+      internalID: -176238694
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Star_Idle_1
+      name: dust_4
       rect:
         serializedVersion: 2
-        x: 472
+        x: 1000
         y: 0
-        width: 472
-        height: 472
+        width: 1000
+        height: 1021
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +208,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8f587d3ff68863b4d91c525104a8a86e
-      internalID: 703583198
+      spriteID: 30a0e12c89464224a9db9f1d0b3f2753
+      internalID: 1546296869
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Star_Idle_2
+      name: dust_5
       rect:
         serializedVersion: 2
-        x: 944
+        x: 2000
         y: 0
-        width: 472
-        height: 472
+        width: 1000
+        height: 1021
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,8 +229,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 82e4326420ba14a4785baedf8f9a93d4
-      internalID: -834593991
+      spriteID: cdf18b7ac19e66340be19f225ce31a78
+      internalID: 1434279941
       vertices: []
       indices: 
       edges: []
@@ -175,17 +238,20 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    spriteID: d1ee38e589abbba42b8fa69bab6b2131
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Star_Idle_0: 2048225141
-      Star_Idle_1: 703583198
-      Star_Idle_2: -834593991
+      dust_0: -972037742
+      dust_1: 310228975
+      dust_2: -889522290
+      dust_3: -176238694
+      dust_4: 1546296869
+      dust_5: 1434279941
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
