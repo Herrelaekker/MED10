@@ -20,6 +20,15 @@ public class MagicAttack : MonoBehaviour
     public GameObject projectilePE;
     public GameObject explosionPE;
 
+    bool coolingDown = false;
+    Vector3[] points = new Vector3[3];
+
+    public float height = 5f;
+    float count = 0;
+
+    bool shootProjectile = false;
+    public Transform projectileStartTrans;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,7 +40,6 @@ public class MagicAttack : MonoBehaviour
         attackCursor.SetActive(false);
         explosionPE.transform.parent = attackCursor.transform;
         explosionPE.transform.localPosition = Vector3.zero;
-        projectilePE.SetActive(true);
     }
 
     Vector3 GetScale(float yPos)
@@ -46,9 +54,8 @@ public class MagicAttack : MonoBehaviour
         return new Vector3(finalScale, finalScale, finalScale);
     }
 
-    IEnumerator PerformAttack()
+    void PerformAttack()
     {
-        yield return new WaitForSeconds(0.5f);
         explosionPE.SetActive(true);
         sr.color = Color.red;
         col.enabled = true;
@@ -63,7 +70,7 @@ public class MagicAttack : MonoBehaviour
         sr.sortingOrder = 10;
         followMouse = true;
         explosionPE.transform.parent = null;
-        StartCoroutine(RemoveParticleEffect()); 
+        StartCoroutine(RemoveParticleEffect());
     }
 
     IEnumerator RemoveParticleEffect()
@@ -72,18 +79,44 @@ public class MagicAttack : MonoBehaviour
         explosionPE.transform.parent = attackCursor.transform;
         explosionPE.transform.localPosition = Vector3.zero;
         explosionPE.SetActive(false);
-
+        sr.color = Color.white;
+        coolingDown = false;
+        if (enabled)
+        {
+            projectilePE.SetActive(true);
+        }
     }
 
     public void EnableMagicAttack()
     {
         bounds = waveSpawner.GetYRange();
         enabled = true;
+        sr.enabled = true;
+
+        explosionPE.SetActive(false);
+
+        StartCoroutine(RemoveParticleEffect());
+
     }
     public void DisableMagicAttack()
     {
         enabled = false;
         sr.enabled = false;
+        projectilePE.SetActive(false);
+    }
+
+    void SetPoints(Vector3 startPos, Vector3 endPos)
+    {
+        points[0] = startPos;
+        points[2] = endPos;
+
+        points[1] = points[0] + (points[2] - points[0]) / 2 + Vector3.up * height;
+    }
+
+    void ShootProjectile() {
+        shootProjectile = true;
+        projectilePE.SetActive(true);
+        SetPoints(projectileStartTrans.position, attackCursor.transform.position);
     }
 
     // Update is called once per frame
@@ -91,12 +124,35 @@ public class MagicAttack : MonoBehaviour
     {
         if (!enabled) return;
 
-        if (Input.GetMouseButtonDown(0) && followMouse)
+        if (shootProjectile)
+        {
+            if (count < 1.05f)
+            {
+                count += 2 * Time.deltaTime;
+
+                Vector3 m1 = Vector3.Lerp(points[0], points[1], count);
+                Vector3 m2 = Vector3.Lerp(points[1], points[2], count);
+                projectilePE.transform.position = Vector3.Lerp(m1, m2, count);
+            }
+            else
+            {
+                shootProjectile = false;
+                count = 0;
+                projectilePE.SetActive(false);
+                projectilePE.transform.position = projectileStartTrans.position;
+
+                PerformAttack();
+            }
+        }
+
+        if (Input.GetMouseButtonDown(0) && !coolingDown)
         {
             followMouse = false;
+            coolingDown = true;
             sr.sortingOrder = 0;
             sr.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            StartCoroutine(PerformAttack());
+
+            ShootProjectile();
         }
 
         if (followMouse)

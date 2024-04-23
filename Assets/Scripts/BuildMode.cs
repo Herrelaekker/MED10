@@ -66,6 +66,8 @@ public class BuildMode : MonoBehaviour
     public Vector2 offsetBlock;
     PlacementType curPlacementType;
 
+    public Transform blockEndTrans;
+
     [System.Serializable]
     public class OnBuildStart : UnityEvent{ }
     public OnBuildStart onBuildStart;
@@ -80,12 +82,14 @@ public class BuildMode : MonoBehaviour
 
     List<GameObject> blue = new List<GameObject> ();
     List<GameObject> green = new List<GameObject> ();
+    PhaseManager phaseManager;
 
     private void Start()
     {
         camera = Camera.main;
         switcher = camera.GetComponent<CinemachineSwitcher>();
         gridManager = FindObjectOfType<GridManager>();
+        phaseManager = FindObjectOfType<PhaseManager>();
     }
 
     public void StartBuildMode()
@@ -284,6 +288,7 @@ public class BuildMode : MonoBehaviour
                 if (t >= 1)
                 {
                     placingTimer = 0;
+                    conjuredBlock.transform.parent = blockEndTrans;
 
                     /*if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
 
@@ -292,10 +297,20 @@ public class BuildMode : MonoBehaviour
                         DoneBuilding();
                     }
                     else*/
+
+                    if (phaseManager.HaveEnoughMana(1))
                         SwitchState(BuildState.PickBlock);
+                    else
+                        DoneBuilding();
                 }
                 break;
         }
+    }
+
+    void DoneBuilding()
+    {
+        SwitchState(BuildState.None);
+        onBuildEnd.Invoke();
     }
 
     void PositionChosen(Vector2Int gridPos, PlacementType type)

@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+public enum Intensity { 
+    Low,
+    High
+}
+
 public class PhaseManager : MonoBehaviour
 {
     BuildMode buildMode;
@@ -14,6 +19,11 @@ public class PhaseManager : MonoBehaviour
 
     public Animator bgAnimator;
     MagicAttack magicAttack;
+    WaveSpawner waveSpawner;
+
+    public Intensity intensity;
+    public int BCIExercisesPerTriangle = 1;
+    public int triangles = 1;
 
     private void Start()
     {
@@ -21,6 +31,16 @@ public class PhaseManager : MonoBehaviour
         battleMode = FindObjectOfType<BattleMode>();
         switcher = Camera.main.GetComponent<CinemachineSwitcher>();
         magicAttack = FindObjectOfType<MagicAttack>();    
+        waveSpawner = FindObjectOfType<WaveSpawner>();
+
+        if (intensity == Intensity.Low)
+        {
+            waveSpawner.SetEnemyAmount(BCIExercisesPerTriangle);
+        }
+        else if (intensity == Intensity.High)
+        {
+            waveSpawner.SetEnemyAmount(triangles * BCIExercisesPerTriangle);
+        }
 
         GoToBattleMode();
         //GoToBuildMode();
@@ -46,7 +66,6 @@ public class PhaseManager : MonoBehaviour
     public void BuildTransitionDone()
     {
         buildMode.StartBuildMode();
-        magicAttack.DisableMagicAttack();
     }
 
     void GoToBattleMode()
@@ -57,6 +76,17 @@ public class PhaseManager : MonoBehaviour
     {
         bgAnimator.SetInteger("Phase", 1);
         switcher.SwitchState("Build");
+        magicAttack.DisableMagicAttack();
+
+    }
+
+    public bool HaveEnoughMana(int mana)
+    {
+        if (this.mana >= mana)
+        {
+            return true;
+        }
+        else return false;
     }
 
     public void AddToMana(int addedMana)

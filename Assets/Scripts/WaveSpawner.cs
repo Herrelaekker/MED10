@@ -50,6 +50,11 @@ public class WaveSpawner : MonoBehaviour
         minSpawnY = spawnRangeTrans1.position.y;
     }
 
+    public void SetEnemyAmount(int amount)
+    {
+        maxDeathAmount = amount;
+    }
+
     public Vector2 GetYRange()
     {
         maxTowerY = towerRangeTrans1.position.y;
