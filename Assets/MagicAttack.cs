@@ -17,6 +17,9 @@ public class MagicAttack : MonoBehaviour
 
     bool enabled = false;
 
+    public GameObject projectilePE;
+    public GameObject explosionPE;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +29,9 @@ public class MagicAttack : MonoBehaviour
         sr = attackCursor.GetComponentInChildren<SpriteRenderer>();
         sr.sortingOrder = 10;
         attackCursor.SetActive(false);
+        explosionPE.transform.parent = attackCursor.transform;
+        explosionPE.transform.localPosition = Vector3.zero;
+        projectilePE.SetActive(true);
     }
 
     Vector3 GetScale(float yPos)
@@ -43,6 +49,7 @@ public class MagicAttack : MonoBehaviour
     IEnumerator PerformAttack()
     {
         yield return new WaitForSeconds(0.5f);
+        explosionPE.SetActive(true);
         sr.color = Color.red;
         col.enabled = true;
         StartCoroutine(RemoveAttack());
@@ -52,9 +59,20 @@ public class MagicAttack : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         col.enabled = false;
-        sr.color = Color.white;
+        sr.color = Color.grey;
         sr.sortingOrder = 10;
         followMouse = true;
+        explosionPE.transform.parent = null;
+        StartCoroutine(RemoveParticleEffect()); 
+    }
+
+    IEnumerator RemoveParticleEffect()
+    {
+        yield return new WaitForSeconds(1f);
+        explosionPE.transform.parent = attackCursor.transform;
+        explosionPE.transform.localPosition = Vector3.zero;
+        explosionPE.SetActive(false);
+
     }
 
     public void EnableMagicAttack()
@@ -73,7 +91,7 @@ public class MagicAttack : MonoBehaviour
     {
         if (!enabled) return;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && followMouse)
         {
             followMouse = false;
             sr.sortingOrder = 0;
