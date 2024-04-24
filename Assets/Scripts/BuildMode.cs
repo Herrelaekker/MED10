@@ -84,12 +84,16 @@ public class BuildMode : MonoBehaviour
     List<GameObject> green = new List<GameObject> ();
     PhaseManager phaseManager;
 
+    float cellSize = 0;
+
     private void Start()
     {
         camera = Camera.main;
         switcher = camera.GetComponent<CinemachineSwitcher>();
         gridManager = FindObjectOfType<GridManager>();
         phaseManager = FindObjectOfType<PhaseManager>();
+
+        cellSize = FindFirstObjectByType<Grid>().cellSize.x;
     }
 
     public void StartBuildMode()
@@ -126,7 +130,7 @@ public class BuildMode : MonoBehaviour
                     button.onClick.AddListener(() => PositionChosen(new Vector2Int(newX, newY), PlacementType.Block));
 
                     RectTransform rectTransform = block.GetComponent<RectTransform>();
-                    Vector3 worldPos = origin +new Vector3(x + offsetPos.x, y + offsetPos.y, 0);
+                    Vector3 worldPos = origin +new Vector3(x* cellSize + offsetPos.x, y*cellSize + offsetPos.y, 0);
 
                     Vector3 viewportPos = Camera.main.WorldToViewportPoint(worldPos);
                     rectTransform.anchoredPosition = new Vector2(1920 * viewportPos.x, 1080 * viewportPos.y);
@@ -146,7 +150,7 @@ public class BuildMode : MonoBehaviour
                     button.onClick.AddListener(() => PositionChosen(new Vector2Int(newX, newY), PlacementType.Decoration));
 
                     RectTransform rectTransform = block.GetComponent<RectTransform>();
-                    Vector3 worldPos = origin + new Vector3(x + offsetPos.x, y + offsetPos.y, 0);
+                    Vector3 worldPos = origin + new Vector3(x  *cellSize + offsetPos.x, y * cellSize + offsetPos.y, 0);
 
                     Vector3 viewportPos = Camera.main.WorldToViewportPoint(worldPos);
                     rectTransform.anchoredPosition = new Vector2(1920 * viewportPos.x, 1080 * viewportPos.y);
@@ -331,7 +335,7 @@ public class BuildMode : MonoBehaviour
             gridManager.TakeDecorationArea(new BoundsInt(new Vector3Int(gridPos.x, gridPos.y, 0), Vector3Int.one));
 
         Vector3 origin = buildingArea.position;
-        Vector3 worldPos = origin + new Vector3(gridPos.x + offsetBlock.x, gridPos.y + offsetBlock.y, 0);
+        Vector3 worldPos = origin + new Vector3(gridPos.x * cellSize + offsetBlock.x, gridPos.y *cellSize+ offsetBlock.y, 0);
         placingBlockEndPos = worldPos;
 
         placingBlockStartPos = conjuredBlock.transform.position;
