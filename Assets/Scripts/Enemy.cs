@@ -15,9 +15,17 @@ public class Enemy : MonoBehaviour
     public float minScale = 1, maxScale = 2;
 
     WaveSpawner waveSpawner;
+    ArrowShooter arrowShooter;
 
     public float health = 4;
 
+    Animator animator;
+    bool dead = false;
+
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
     public void SetWayPoints(Vector3 startPoint, Vector3 goalPoint)
     {
         this.goalPoint = goalPoint;
@@ -46,28 +54,41 @@ public class Enemy : MonoBehaviour
         return new Vector3(finalScale, finalScale, finalScale);
     }
 
+    void Die()
+    {
+        waveSpawner.EnemiesKilled(1);
+        animator.SetBool("dead", true);
+        dead = true;
+        if (arrowShooter)
+            arrowShooter.RemoveEnemyFromList(gameObject);
+    }
     public void HitByArrow()
     {
         health -= 1;
         if (health <= 0)
         {
-            waveSpawner.EnemiesKilled(1);
-            Destroy(gameObject);
+            Die();
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (dead) return;
         if (collision.CompareTag("MagicAttack"))
         {
-            waveSpawner.EnemiesKilled(1);
-            Destroy(gameObject);
+            Die();
         }
 
         if (collision.CompareTag("ArrowRange"))
         {
-            collision.GetComponent<ArrowShooter>().EnemyInRange(gameObject);
+            arrowShooter = collision.GetComponent<ArrowShooter>();
+            arrowShooter.EnemyInRange(gameObject);
         }
+    }
+
+    public void DoneBeingDead()
+    {
+        Destroy(gameObject);
     }
 
     private void FixedUpdate()

@@ -14,6 +14,12 @@ public class ContinuousFeedback : MonoBehaviour
 
     public float minAlpha = 0.25f, maxAlpha = 1;
 
+    [SerializeField]
+    private Gradient gradient = new Gradient();
+
+    public float minScale = .25f, maxScale = .5f;
+    float curScaleVal;
+
     private void Start()
     {
         SimBCIInput fabBCIInput = FindObjectOfType<SimBCIInput>();
@@ -33,6 +39,8 @@ public class ContinuousFeedback : MonoBehaviour
         psMains = new ParticleSystem.MainModule[particles.Length];
         for ( int i = 0; i < psMains.Length; i++)
             psMains[i] = particles[i].main;
+
+        curScaleVal = minScale;
     }
 
     public void SetConfidence(float confidence)
@@ -50,6 +58,30 @@ public class ContinuousFeedback : MonoBehaviour
         if (isActive)
         {
             SetAlpha();
+            SetScale();
+        }
+    }
+
+    void SetScale()
+    {
+        /*if (confidence >= classficationThreshold)
+        {
+            if (curScaleVal <= maxScale)
+                curScaleVal += Time.deltaTime;
+        }
+        else
+        {
+            if (curScaleVal >= minScale )
+                curScaleVal -= Time.deltaTime;
+        }
+        for (int i = 0; i < psMains.Length; i++)
+        {
+            particles[i].transform.localScale = new Vector3(curScaleVal, curScaleVal, curScaleVal);
+        }*/
+        float scaleVal = Mathf.Lerp(minScale, maxScale, confidence);
+        for (int i = 0; i < psMains.Length; i++)
+        {
+            particles[i].transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
         }
     }
 
@@ -58,8 +90,14 @@ public class ContinuousFeedback : MonoBehaviour
         Color col = Color.white;
         float t = confidence / classficationThreshold;
         float alphaVal = Mathf.Lerp(minAlpha, maxAlpha, t);
-        for(int i = 0; i < psMains.Length; i++)
-            psMains[i].startColor = new Color(col.r, col.g, col.b, alphaVal);
+        //float scaleVal = Mathf.Lerp(minSize, maxSize, t);
+        Color color = gradient.Evaluate(t);
+
+        for (int i = 0; i < psMains.Length; i++)
+        {
+            psMains[i].startColor = color;
+            //particles[i].transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
+        }
     }
 
 }

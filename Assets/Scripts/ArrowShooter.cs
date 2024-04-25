@@ -44,10 +44,14 @@ public class ArrowShooter : MonoBehaviour
 
     void Shoot(GameObject enemy)
     {
-        print("Åh åh pil av av");
         var arrowObj = Instantiate(arrowPrefab, arrowSpawnTrans);
         Arrow arrow = arrowObj.GetComponent<Arrow>();
         arrow.SetPoints(arrowSpawnTrans.position, enemy.transform.position, enemy.GetComponent<Enemy>());
+    }
+
+    public void RemoveEnemyFromList(GameObject enemy)
+    {
+        enemiesInRange.Remove(enemy);
     }
 
     public void EnemyInRange(GameObject enemy)
