@@ -42,6 +42,12 @@ public class ArrowShooter : MonoBehaviour
         }
     }
 
+    public void StopShooting()
+    {
+        timer = 0;
+        enemiesInRange.Clear();
+    }
+
     void Shoot(GameObject enemy)
     {
         var arrowObj = Instantiate(arrowPrefab, arrowSpawnTrans);
@@ -57,6 +63,5 @@ public class ArrowShooter : MonoBehaviour
     public void EnemyInRange(GameObject enemy)
     {
         enemiesInRange.Add(enemy);
-        //Destroy(collision.gameObject);
     }
 }

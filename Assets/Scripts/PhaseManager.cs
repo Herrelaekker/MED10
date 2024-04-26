@@ -5,7 +5,8 @@ using TMPro;
 
 public enum Intensity { 
     Low,
-    High
+    High,
+    UserChosen
 }
 
 public class PhaseManager : MonoBehaviour
@@ -24,6 +25,11 @@ public class PhaseManager : MonoBehaviour
     public Intensity intensity;
     public int BCIExercisesPerTriangle = 1;
     public int triangles = 1;
+    public int iterations = 1;
+
+    int maxManaPerPhase;
+
+    public GameObject userChosenIntensityUI;
 
     private void Start()
     {
@@ -35,15 +41,34 @@ public class PhaseManager : MonoBehaviour
 
         if (intensity == Intensity.Low)
         {
+            maxManaPerPhase = BCIExercisesPerTriangle;
             waveSpawner.SetEnemyAmount(BCIExercisesPerTriangle);
         }
         else if (intensity == Intensity.High)
         {
+            maxManaPerPhase = BCIExercisesPerTriangle * triangles;
             waveSpawner.SetEnemyAmount(triangles * BCIExercisesPerTriangle);
         }
+        else if (intensity == Intensity.UserChosen)
+        {
+
+            maxManaPerPhase = BCIExercisesPerTriangle * triangles * iterations;
+            waveSpawner.SetEnemyAmount(triangles * BCIExercisesPerTriangle);
+            userChosenIntensityUI.SetActive(true);
+        }
+
+        waveSpawner.SetMaxTotalDeaths(BCIExercisesPerTriangle * triangles * iterations);
+
+
+
 
         GoToBattleMode();
         //GoToBuildMode();
+    }
+
+    public void NoMoreDefending()
+    {
+        buildMode.NoMoreDefending();
     }
 
     public void BuildModeEnded()
@@ -63,6 +88,7 @@ public class PhaseManager : MonoBehaviour
         switcher.SwitchState("Battle");
         magicAttack.EnableMagicAttack();
     }
+
     public void BuildTransitionDone()
     {
         buildMode.StartBuildMode();
@@ -77,7 +103,6 @@ public class PhaseManager : MonoBehaviour
         bgAnimator.SetInteger("Phase", 1);
         switcher.SwitchState("Build");
         magicAttack.DisableMagicAttack();
-
     }
 
     public bool HaveEnoughMana(int mana)
@@ -91,13 +116,27 @@ public class PhaseManager : MonoBehaviour
 
     public void AddToMana(int addedMana)
     {
-        mana += addedMana;
+        if (mana + addedMana > maxManaPerPhase)
+        {
+            mana = maxManaPerPhase;
+        }
+        else
+        {
+            mana += addedMana;
+        }
         manaText.text = mana.ToString();
     }
 
     public void RemoveMana(int removedMana = 1)
     {
-        mana -= removedMana;
+        if (mana - removedMana < 0)
+        {
+            mana = 0;
+        }
+        else
+        {
+            mana -= removedMana;
+        }
         manaText.text = mana.ToString();
     }
 }

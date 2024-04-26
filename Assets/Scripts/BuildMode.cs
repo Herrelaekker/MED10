@@ -1,3 +1,4 @@
+using Cinemachine;
 using ExternalPropertyAttributes;
 using System.Collections;
 using System.Collections.Generic;
@@ -86,6 +87,20 @@ public class BuildMode : MonoBehaviour
 
     float cellSize = 0;
 
+    public GameObject backToDefendingBtn;
+
+    bool noMoreDefending = false;
+
+    public CinemachineVirtualCamera buildingCam;
+
+    public float minOrthoSize = 6, maxOrthoSize = 12;
+    public float minBuildCamYpos = -0.9f, maxBuildCamYpos = 3.9f;
+
+    public int yHeightTotal = 17;
+
+    int curHighestYPos;
+    public int lowestYPos = -6;
+
     private void Start()
     {
         camera = Camera.main;
@@ -94,6 +109,12 @@ public class BuildMode : MonoBehaviour
         phaseManager = FindObjectOfType<PhaseManager>();
 
         cellSize = FindFirstObjectByType<Grid>().cellSize.x;
+        curHighestYPos = lowestYPos;
+    }
+    
+    public void NoMoreDefending()
+    {
+        noMoreDefending = true;
     }
 
     public void StartBuildMode()
@@ -128,6 +149,7 @@ public class BuildMode : MonoBehaviour
                     int newX = x + origin.x;
                     int newY = y + origin.y;
                     button.onClick.AddListener(() => PositionChosen(new Vector2Int(newX, newY), PlacementType.Block));
+                    print("newX " + newX + ", newY " + newY);
 
                     RectTransform rectTransform = block.GetComponent<RectTransform>();
                     Vector3 worldPos = origin +new Vector3(x* cellSize + offsetPos.x, y*cellSize + offsetPos.y, 0);
@@ -148,6 +170,7 @@ public class BuildMode : MonoBehaviour
                     int newX = x + origin.x;
                     int newY = y + origin.y;
                     button.onClick.AddListener(() => PositionChosen(new Vector2Int(newX, newY), PlacementType.Decoration));
+                    print("newX " + newX + ", newY " + newY);
 
                     RectTransform rectTransform = block.GetComponent<RectTransform>();
                     Vector3 worldPos = origin + new Vector3(x  *cellSize + offsetPos.x, y * cellSize + offsetPos.y, 0);
@@ -169,6 +192,8 @@ public class BuildMode : MonoBehaviour
 
         pickBlockUI.SetActive(false);
         placeBlockUI.SetActive(false);
+        backToDefendingBtn.SetActive(false);
+
 
         switch (state)
         {
@@ -181,6 +206,9 @@ public class BuildMode : MonoBehaviour
             case BuildState.PickBlock:
                 PickBlockStart();
                 playerCharAnimator.SetBool("PickedPlacement", false);
+                
+                if (!noMoreDefending)
+                    backToDefendingBtn.SetActive(true);
 
                 pickBlockUI.SetActive(true);
                 break;
@@ -280,6 +308,23 @@ public class BuildMode : MonoBehaviour
         SwitchState(BuildState.PickBlock);
     }
 
+    void UpdateBuildingCamera(int blocksYPos)
+    {
+        if (blocksYPos > curHighestYPos)
+            curHighestYPos = blocksYPos;
+
+        float yBlockAmount = curHighestYPos - lowestYPos;
+        print("Y Block Amount: " + yBlockAmount + " = " + curHighestYPos +" - " + lowestYPos);
+
+        float t = yBlockAmount / yHeightTotal;
+        if (t>1) { t = 1; }
+        float lensOrthoSize = Mathf.Lerp(minOrthoSize, maxOrthoSize, t);
+        float yPos = Mathf.Lerp(minBuildCamYpos, maxBuildCamYpos, t);
+        Vector3 cameraPos = buildingCam.transform.position;
+        buildingCam.transform.position = new Vector3(cameraPos.x, yPos, cameraPos.z);
+        buildingCam.m_Lens.OrthographicSize = lensOrthoSize;
+    }
+
     private void FixedUpdate()
     {
         switch (state)
@@ -311,7 +356,7 @@ public class BuildMode : MonoBehaviour
         }
     }
 
-    void DoneBuilding()
+    public void DoneBuilding()
     {
         SwitchState(BuildState.None);
         onBuildEnd.Invoke();
@@ -321,6 +366,8 @@ public class BuildMode : MonoBehaviour
     {
         print(gridPos);
         //Destroy(posOptionBtns[gridPos.x, gridPos.y]);
+
+        UpdateBuildingCamera(gridPos.y);
 
         foreach (GameObject btn in posOptionBtns)
             if (btn != null)
@@ -354,9 +401,11 @@ public class BuildMode : MonoBehaviour
         magicTrailPE.transform.parent = conjuredBlock.transform;
         magicTrailPE.transform.localPosition = Vector3.zero;
 
+        SpriteRenderer spriteRend = conjuredBlock.GetComponent<SpriteRenderer>();
+        spriteRend.sortingLayerName = "Wall";
+
         if (curPlacementType == PlacementType.Block)
         {
-            SpriteRenderer spriteRend = conjuredBlock.GetComponent<SpriteRenderer>();
             if (decisionData.decision != TrialType.AccInput && decisionData.decision != TrialType.FabInput)
                 spriteRend.sprite = crackedWall;
             else if (decisionData.classification == MotorImageryEvent.GoldenMotorImagery)

@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     private Vector3 startPoint;
 
     public float timeBeforeReachingGoal = 5f;
+    private float timeBeforeBlownAway;
     private float timer = 0;
 
     Vector2 bounds;
@@ -21,6 +22,9 @@ public class Enemy : MonoBehaviour
 
     Animator animator;
     bool dead = false;
+    bool blownAway = false;
+    Vector3 blowAwayStartPoint;
+    Vector3 blowAwayEndPoint;
 
     private void Start()
     {
@@ -90,16 +94,42 @@ public class Enemy : MonoBehaviour
     {
         Destroy(gameObject);
     }
+    
+    public void BlowAway(float time)
+    {
+        blownAway = true;
+        blowAwayStartPoint = transform.position;
+        blowAwayEndPoint = startPoint ;
+        timer = 0;
+        timeBeforeBlownAway = time;
+
+        if (arrowShooter)
+            arrowShooter.StopShooting();
+    }
 
     private void FixedUpdate()
     {
        // if (goalPoint)
+
+        if (dead) { return; }
+
+        if (!blownAway) 
         {
             timer += Time.fixedDeltaTime;
             float t = timer / timeBeforeReachingGoal;
             transform.position = Vector3.Lerp(startPoint, goalPoint, t);
             
             transform.localScale = GetScale(transform.position.y);
+        }
+        else
+        {
+            timer += Time.fixedDeltaTime;
+            float t = timer / timeBeforeBlownAway;
+            transform.position = Vector3.Lerp(blowAwayStartPoint, blowAwayEndPoint, t);
+
+            transform.localScale = GetScale(transform.position.y);
+            if (t >= 1)
+                Destroy(gameObject);
         }
     }
 }

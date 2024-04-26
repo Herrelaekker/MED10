@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeBeforeReachingGoal: 20
+  timeBeforeBlownAway: 2
   minScale: 0.5
   maxScale: 1
   health: 3

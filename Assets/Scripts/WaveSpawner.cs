@@ -7,6 +7,7 @@ using TMPro;
 public class WaveSpawner : MonoBehaviour
 {
     public float timeBeforeSpawning = 4f;
+    public float timeBeforeBlowingAway = 1f;
     private float timer = 0;
 
    // public Lane[] lanes;
@@ -39,15 +40,32 @@ public class WaveSpawner : MonoBehaviour
     public class OnEnemiesKilled : UnityEvent<int> { }
     public OnEnemiesKilled onEnemiesKilled;
 
+    bool blowAway = false;
+
+    List<Enemy> enemies = new List<Enemy>();
+
+    public GameObject backToBuildingBtn;
+
+    int deathTotal = 0;
+    int deathTotalMax = 0;
+
+    PhaseManager phaseManager;
+
     private void Awake()
     {
         battleMode = FindObjectOfType<BattleMode>();
+        phaseManager = FindObjectOfType<PhaseManager>();
         totalSpawnRangeX = Mathf.Abs(spawnRangeTrans1.position.x) + Mathf.Abs(spawnRangeTrans2.position.x);
         totalTowerRangeX = Mathf.Abs(towerRangeTrans1.position.x) + Mathf.Abs(towerRangeTrans2.position.x);
         spawnToTowerRatio = totalTowerRangeX / totalSpawnRangeX;
 
         maxTowerY = towerRangeTrans1.position.y;
         minSpawnY = spawnRangeTrans1.position.y;
+    }
+
+    public void SetMaxTotalDeaths(int amount)
+    {
+        deathTotalMax = amount;
     }
 
     public void SetEnemyAmount(int amount)
@@ -64,9 +82,9 @@ public class WaveSpawner : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isActive)
+        if (isActive && !blowAway)
         {
-            if (enemySpawnCounter < maxDeathAmount)
+            //if (enemySpawnCounter < maxDeathAmount)
             {
                 timer += Time.fixedDeltaTime;
                 if (timeBeforeSpawning <= timer)
@@ -81,20 +99,57 @@ public class WaveSpawner : MonoBehaviour
 
     public void EnemiesKilled(int amount)
     {
-        deathAmount += amount;
-        onEnemiesKilled.Invoke(amount);
-        if (deathAmount >= maxDeathAmount)
+        if (deathAmount + amount <= maxDeathAmount)
         {
-            deathAmount = 0;
-            battleMode.EndBattle();
+            deathTotal += amount;
         }
+        deathAmount += amount;
+
+        backToBuildingBtn.SetActive(true);
+        onEnemiesKilled.Invoke(amount);
+
+        if (deathTotal >= deathTotalMax)
+        {
+            deathAmount = maxDeathAmount;
+            phaseManager.NoMoreDefending();
+            StopBattle();
+
+        }else if (deathAmount >= maxDeathAmount)
+        {
+            deathAmount = maxDeathAmount;
+            StopBattle();
+        }
+    }
+
+    public void StopBattle()
+    {
+        backToBuildingBtn.SetActive(false);
+        deathAmount = 0;
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy != null)
+            {
+                enemy.BlowAway(timeBeforeBlowingAway);
+            }
+        }
+        StartCoroutine(EndBattleAfterBlow());
+        StopSpawning();
+    }
+
+    IEnumerator EndBattleAfterBlow()
+    {
+        yield return new WaitForSeconds(timeBeforeBlowingAway);
+        battleMode.EndBattle();
     }
 
     public void StartSpawning()
     {
+        if (phaseManager.HaveEnoughMana(1))
+            backToBuildingBtn.SetActive(true) ;
         isActive = true;
         timer = 0;
         enemySpawnCounter = 0;
+        deathAmount = 0;
     }
 
     public void StopSpawning()
@@ -113,6 +168,7 @@ public class WaveSpawner : MonoBehaviour
         enemyObjInstance.transform.position = startPos;
 
         Enemy enemy = enemyObjInstance.GetComponent<Enemy>();
+        enemies.Add(enemy);
 
         Vector3 endPos = new Vector3(rndXPos * spawnToTowerRatio, towerRangeTrans1.position.y, towerRangeTrans1.position.z);
         enemy.SetWayPoints(startPos, endPos);
