@@ -31,6 +31,10 @@ public class PhaseManager : MonoBehaviour
 
     public GameObject userChosenIntensityUI;
 
+    public int manaAmountPerEnemy = 5;
+
+    SoundManager soundManager;
+
     private void Start()
     {
         buildMode = FindObjectOfType<BuildMode>();
@@ -38,6 +42,7 @@ public class PhaseManager : MonoBehaviour
         switcher = Camera.main.GetComponent<CinemachineSwitcher>();
         magicAttack = FindObjectOfType<MagicAttack>();    
         waveSpawner = FindObjectOfType<WaveSpawner>();
+        soundManager = FindObjectOfType<SoundManager>();
 
         if (intensity == Intensity.Low)
         {
@@ -58,9 +63,6 @@ public class PhaseManager : MonoBehaviour
         }
 
         waveSpawner.SetMaxTotalDeaths(BCIExercisesPerTriangle * triangles * iterations);
-
-
-
 
         GoToBattleMode();
         //GoToBuildMode();
@@ -87,11 +89,14 @@ public class PhaseManager : MonoBehaviour
         battleMode.StartBattle();
         switcher.SwitchState("Battle");
         magicAttack.EnableMagicAttack();
+        soundManager.SwapTrack(false);
     }
 
     public void BuildTransitionDone()
     {
         buildMode.StartBuildMode();
+        soundManager.SwapTrack(true);
+
     }
 
     void GoToBattleMode()
@@ -116,9 +121,10 @@ public class PhaseManager : MonoBehaviour
 
     public void AddToMana(int addedMana)
     {
-        if (mana + addedMana > maxManaPerPhase)
+        addedMana *= manaAmountPerEnemy;
+        if (mana + addedMana > maxManaPerPhase * manaAmountPerEnemy)
         {
-            mana = maxManaPerPhase;
+            mana = maxManaPerPhase * manaAmountPerEnemy;
         }
         else
         {
@@ -129,6 +135,7 @@ public class PhaseManager : MonoBehaviour
 
     public void RemoveMana(int removedMana = 1)
     {
+        removedMana *= manaAmountPerEnemy;
         if (mana - removedMana < 0)
         {
             mana = 0;

@@ -79,7 +79,11 @@ public class BuildMode : MonoBehaviour
 
     [System.Serializable]
     public class OnBlockConjured : UnityEvent { }
-    public OnBlockConjured onBlockConjured;
+    public OnBlockConjured onBlockConjured;    
+    
+    [System.Serializable]
+    public class OnStartConjureBlock : UnityEvent { }
+    public OnStartConjureBlock onStartConjureBlock;
 
     List<GameObject> blue = new List<GameObject> ();
     List<GameObject> green = new List<GameObject> ();
@@ -101,6 +105,17 @@ public class BuildMode : MonoBehaviour
     int curHighestYPos;
     public int lowestYPos = -6;
 
+    bool updatingCamera = false;
+
+    public float timeToChangeCamera = 2;
+    float cameraChangeTimer = 0;
+
+    float orthoSizeBefore;
+    Vector3 posBefore;
+
+    float orthoSize;
+    float yPos;
+
     private void Start()
     {
         camera = Camera.main;
@@ -110,6 +125,8 @@ public class BuildMode : MonoBehaviour
 
         cellSize = FindFirstObjectByType<Grid>().cellSize.x;
         curHighestYPos = lowestYPos;
+
+        UpdateBuildingCamera(curHighestYPos);
     }
     
     public void NoMoreDefending()
@@ -157,6 +174,9 @@ public class BuildMode : MonoBehaviour
                     Vector3 viewportPos = Camera.main.WorldToViewportPoint(worldPos);
                     rectTransform.anchoredPosition = new Vector2(1920 * viewportPos.x, 1080 * viewportPos.y);
 
+                    float blockScale = minOrthoSize / orthoSize;
+                    block.transform.localScale = new Vector3(blockScale, blockScale, blockScale);
+
                     //block.transform.anchoredPosition = worldPos;
                     posOptionBtns[x, y] = block;
                     blue.Add(block);
@@ -177,6 +197,9 @@ public class BuildMode : MonoBehaviour
 
                     Vector3 viewportPos = Camera.main.WorldToViewportPoint(worldPos);
                     rectTransform.anchoredPosition = new Vector2(1920 * viewportPos.x, 1080 * viewportPos.y);
+
+                    float blockScale = minOrthoSize / orthoSize;
+                    block.transform.localScale = new Vector3(blockScale, blockScale, blockScale);
 
                     //block.transform.anchoredPosition = worldPos;
                     posDecorationBtns[x, y] = block;
@@ -291,7 +314,7 @@ public class BuildMode : MonoBehaviour
         magicPE.SetActive(true);
         magicBurstPE.SetActive(false);
         magicTrailPE.SetActive(false);
-
+        onStartConjureBlock.Invoke();
         SwitchState(BuildState.Conjure);
     }
 
@@ -317,16 +340,38 @@ public class BuildMode : MonoBehaviour
         print("Y Block Amount: " + yBlockAmount + " = " + curHighestYPos +" - " + lowestYPos);
 
         float t = yBlockAmount / yHeightTotal;
-        if (t>1) { t = 1; }
-        float lensOrthoSize = Mathf.Lerp(minOrthoSize, maxOrthoSize, t);
-        float yPos = Mathf.Lerp(minBuildCamYpos, maxBuildCamYpos, t);
-        Vector3 cameraPos = buildingCam.transform.position;
-        buildingCam.transform.position = new Vector3(cameraPos.x, yPos, cameraPos.z);
-        buildingCam.m_Lens.OrthographicSize = lensOrthoSize;
+        if (t > 1) { t = 1; }
+
+        orthoSizeBefore = buildingCam.m_Lens.OrthographicSize;
+        posBefore = buildingCam.transform.position;
+
+        orthoSize = Mathf.Lerp(minOrthoSize, maxOrthoSize, t);
+        yPos = Mathf.Lerp(minBuildCamYpos, maxBuildCamYpos, t);
+
+        updatingCamera = true;
+
     }
 
     private void FixedUpdate()
     {
+        if (updatingCamera)
+        {
+            cameraChangeTimer += Time.fixedDeltaTime;
+
+            float t = cameraChangeTimer / timeToChangeCamera;
+            Vector3 cameraPos = buildingCam.transform.position;
+
+            buildingCam.transform.position = Vector3.Lerp(posBefore, new Vector3(cameraPos.x, yPos, cameraPos.z), t);
+            buildingCam.m_Lens.OrthographicSize = Mathf.Lerp(orthoSizeBefore, orthoSize, t);
+
+            if (cameraChangeTimer > timeToChangeCamera)
+            {
+                updatingCamera = false;
+                cameraChangeTimer = 0;
+            }
+        }
+
+
         switch (state)
         {
             case BuildState.BlockPlaceTransition:

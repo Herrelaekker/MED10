@@ -8,6 +8,7 @@ TagManager:
   - MagicAttack
   - ArrowRange
   - Arrow
+  - BlowEffect
   layers:
   - Default
   - TransparentFX

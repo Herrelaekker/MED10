@@ -14,10 +14,12 @@ public class Arrow : MonoBehaviour
 
     Quaternion endRotation;
     Enemy enemy;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+       
     }
 
     public void SetPoints(Vector3 startPos, Vector3 endPos, Enemy enemy)

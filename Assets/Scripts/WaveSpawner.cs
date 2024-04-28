@@ -51,6 +51,13 @@ public class WaveSpawner : MonoBehaviour
 
     PhaseManager phaseManager;
 
+    public GameObject blowEffect;
+    public float blowEffectDuration = 1f;
+    float blowEffectTimer = 0f;
+    Vector3 blowEffectStartPos;
+    public Transform blowEffectEndPos;
+
+
     private void Awake()
     {
         battleMode = FindObjectOfType<BattleMode>();
@@ -61,6 +68,8 @@ public class WaveSpawner : MonoBehaviour
 
         maxTowerY = towerRangeTrans1.position.y;
         minSpawnY = spawnRangeTrans1.position.y;
+
+        blowEffectStartPos = blowEffect.transform.position;
     }
 
     public void SetMaxTotalDeaths(int amount)
@@ -82,7 +91,7 @@ public class WaveSpawner : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isActive && !blowAway)
+        if (!blowAway && isActive)
         {
             //if (enemySpawnCounter < maxDeathAmount)
             {
@@ -94,6 +103,30 @@ public class WaveSpawner : MonoBehaviour
                     enemySpawnCounter++;
                 }
             }
+        }
+        else if (blowAway) 
+        {
+            blowEffectTimer += Time.fixedDeltaTime;
+
+            if (blowEffectTimer >= blowEffectDuration)
+            {
+                blowEffectTimer = 0;
+                blowAway = false;
+                foreach (Enemy enemy in enemies)
+                {
+                    if (enemy != null)
+                    {
+                        Destroy(enemy.gameObject);
+                    }
+                }
+                blowEffect.SetActive(false);
+
+                enemies.Clear();
+            }
+
+            float t = blowEffectTimer / blowEffectDuration;
+
+            blowEffect.transform.position = Vector3.Lerp(blowEffectStartPos, blowEffectEndPos.position, t);  
         }
     }
 
@@ -132,12 +165,17 @@ public class WaveSpawner : MonoBehaviour
                 enemy.BlowAway(timeBeforeBlowingAway);
             }
         }
+
+        blowAway = true;
+        blowEffect.SetActive(true);
+
         StartCoroutine(EndBattleAfterBlow());
         StopSpawning();
     }
 
     IEnumerator EndBattleAfterBlow()
     {
+
         yield return new WaitForSeconds(timeBeforeBlowingAway);
         battleMode.EndBattle();
     }
@@ -174,5 +212,10 @@ public class WaveSpawner : MonoBehaviour
         enemy.SetWayPoints(startPos, endPos);
         enemy.SetBounds(GetYRange());
         enemy.SetWaveSpawner(this);
+
+        if (enemySpawnCounter % 2 == 0)
+        {
+            enemy.PlaySpawnSound();
+        }
     }
 }

@@ -26,10 +26,19 @@ public class Enemy : MonoBehaviour
     Vector3 blowAwayStartPoint;
     Vector3 blowAwayEndPoint;
 
+    public AudioSource spawnSound;
+    public AudioSource deathSound;
+
     private void Start()
     {
         animator = GetComponent<Animator>();
     }
+    public void PlaySpawnSound()
+    {
+        spawnSound.pitch = Random.Range(0.85f, 1.15f);
+        spawnSound.Play();
+    }
+
     public void SetWayPoints(Vector3 startPoint, Vector3 goalPoint)
     {
         this.goalPoint = goalPoint;
@@ -60,6 +69,7 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        deathSound.Play();
         waveSpawner.EnemiesKilled(1);
         animator.SetBool("dead", true);
         dead = true;
@@ -87,6 +97,11 @@ public class Enemy : MonoBehaviour
         {
             arrowShooter = collision.GetComponent<ArrowShooter>();
             arrowShooter.EnemyInRange(gameObject);
+        }
+
+        if (collision.CompareTag("BlowEffect"))
+        {
+            transform.parent = collision.transform;
         }
     }
 
@@ -121,7 +136,7 @@ public class Enemy : MonoBehaviour
             
             transform.localScale = GetScale(transform.position.y);
         }
-        else
+        /*else
         {
             timer += Time.fixedDeltaTime;
             float t = timer / timeBeforeBlownAway;
@@ -130,6 +145,6 @@ public class Enemy : MonoBehaviour
             transform.localScale = GetScale(transform.position.y);
             if (t >= 1)
                 Destroy(gameObject);
-        }
+        }*/
     }
 }

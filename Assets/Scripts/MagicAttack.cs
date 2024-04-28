@@ -29,6 +29,10 @@ public class MagicAttack : MonoBehaviour
     bool shootProjectile = false;
     public Transform projectileStartTrans;
 
+    public AudioSource spellHitSound;
+    public AudioSource spellSpawnSound;
+    public AudioSource spellReadySound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -56,6 +60,8 @@ public class MagicAttack : MonoBehaviour
 
     void PerformAttack()
     {
+        spellReadySound.Stop();
+        spellHitSound.Play();
         explosionPE.SetActive(true);
         sr.color = Color.red;
         col.enabled = true;
@@ -75,6 +81,7 @@ public class MagicAttack : MonoBehaviour
 
     IEnumerator RemoveParticleEffect()
     {
+        spellSpawnSound.Play();
         yield return new WaitForSeconds(1f);
         explosionPE.transform.parent = attackCursor.transform;
         explosionPE.transform.localPosition = Vector3.zero;
@@ -84,6 +91,7 @@ public class MagicAttack : MonoBehaviour
         if (enabled)
         {
             projectilePE.SetActive(true);
+            spellReadySound.Play();
         }
     }
 
