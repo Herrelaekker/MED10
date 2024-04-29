@@ -48,11 +48,7 @@ public enum GameState {
 
 public enum TrialType  {
      AccInput,
-     FabInput,
      RejInput,
-     AssistSuccess,
-     AssistFail,
-     ExplicitSham
 }
 
 public class GameManager : MonoBehaviour
@@ -70,17 +66,8 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<string, Mechanism> mechanisms = new Dictionary<string, Mechanism>();
 
-    [Header("FabInput Settings")]
-    [Tooltip("When should the fabrication fire.")]
-    [SerializeField]
-    private float noInputReceivedFabAlarm = 0.5f; // fixed alarm in seconds relative to input window, at what point should we try and trigger fab input.
-    [SerializeField]
-    private float fabAlarmVariability = 0.5f; //added delay variability to make the alarm unpredictable.
-    private float currentFabAlarm = 0f;
     private bool alarmFired = false;
-    private int fabInputNumber = 0;
     private MotorImageryEvent classification;
-
 
     [Header("InputWindow Settings")]
     [Tooltip("Length of Window and Inter-trial interval.")]
@@ -162,8 +149,6 @@ public class GameManager : MonoBehaviour
             {"Trials", trialsTotal},
             {"InterTrialInterval_sec", interTrialIntervalSeconds},
             {"InputWindow_sec", inputWindowSeconds},
-            {"noInputReceivedFabAlarm_sec", noInputReceivedFabAlarm},
-            {"FabAlarmVariability_sec", fabAlarmVariability},
         };
         loggingManager.Log("Meta", metaLog);
     }
@@ -176,7 +161,6 @@ public class GameManager : MonoBehaviour
             {"InterTrialTimer", interTrialTimer},
             {"InputWindowTimer", inputWindowTimer},
             {"GameState", System.Enum.GetName(typeof(GameState), gameState)},
-            {"CurrentFabAlarm", currentFabAlarm},
         };
 
         foreach (KeyValuePair<string, Mechanism> pair in mechanisms) {
@@ -205,7 +189,7 @@ public class GameManager : MonoBehaviour
                 if (interTrialTimer > interTrialIntervalSeconds && currentTrial < trialsTotal) {
                     interTrialTimer = 0f;
                     inputWindow = InputWindowState.Open;
-                    SetFabAlarmVariability();
+                    //SetFabAlarmVariability();
                     onInputWindowChanged.Invoke(inputWindow);
                     LogEvent("InputWindowChange");
                 } else if (interTrialTimer > interTrialIntervalSeconds) {
@@ -214,17 +198,16 @@ public class GameManager : MonoBehaviour
             } else if (inputWindow == InputWindowState.Open) {
                 //Debug.Log("inputwindow is open");
                 inputWindowTimer += Time.deltaTime;
-                if (inputWindowTimer > currentFabAlarm && alarmFired == false) {
+                /*if (alarmFired == false) {
                    //Debug.Log("inputWindowTimer exceeded currentFabAlarm.");
                     // Fire fabricated input (if scheduled).
                     InputData fabInputData = new InputData {
                         validity = InputValidity.Accepted,
-                        type = InputType.FabInput,
-                        inputNumber = fabInputNumber
+                        type = InputType.FabInput
                     };
-                    MakeInputDecision(fabInputData, false);
+                    MakeInputDecision(fabInputData, true);
                     alarmFired = true;
-                } else if (inputWindowTimer > inputWindowSeconds) {
+                } else */if (inputWindowTimer > inputWindowSeconds) {
                    //Debug.Log("inputWindow expired.");
                     // The input window expired
                     MakeInputDecision(bestInputData, true);
@@ -240,9 +223,9 @@ public class GameManager : MonoBehaviour
         onGameTimeUpdate.Invoke(gameTimers);
     }
 
-    public void SetFabAlarmVariability() {
+    /*public void SetFabAlarmVariability() {
         currentFabAlarm = UnityEngine.Random.Range(noInputReceivedFabAlarm-fabAlarmVariability, noInputReceivedFabAlarm+fabAlarmVariability);
-    }
+    }*/
 
     public GameData createGameData() {
             GameData gameData = new GameData();
@@ -250,8 +233,6 @@ public class GameManager : MonoBehaviour
             gameData.interTrialIntervalSeconds = interTrialIntervalSeconds;
             gameData.inputWindowSeconds = inputWindowSeconds;
             gameData.gameState = gameState;
-            gameData.noInputReceivedFabAlarm = noInputReceivedFabAlarm;
-            gameData.fabAlarmVariability = fabAlarmVariability;
             return gameData;
     }
 
@@ -333,7 +314,6 @@ public class GameManager : MonoBehaviour
         CalculateRecogRate();
         // Send Decision Data
         GameDecisionData gameDecisionData = new GameDecisionData();
-        gameDecisionData.currentFabAlarm = currentFabAlarm;
         gameDecisionData.decision = trialResult;
         gameDecisionData.classification = classification;
         gameDecision.Invoke(gameDecisionData);
@@ -350,25 +330,13 @@ public class GameManager : MonoBehaviour
         trialGoal = (TrialType) System.Enum.Parse(typeof(TrialType), entry);
         trialResult = TrialType.RejInput;
 
+        print("trialresult " + trialResult);
 
         if (inputData != null)
         {
             classification = inputData.classification;
 
-            if (inputData.type == InputType.FabInput)
-            {
-                if (trialGoal == TrialType.FabInput)
-                {
-                    trialResult = TrialType.FabInput;
-                    CloseInputWindow();
-                }
-                else if (trialGoal == TrialType.ExplicitSham)
-                {
-                    trialResult = TrialType.ExplicitSham;
-                    CloseInputWindow();
-                }
-            }
-            else if (trialGoal == TrialType.AccInput)
+           if (trialGoal == TrialType.AccInput)
             {
                 if (inputData.validity == InputValidity.Accepted)
                 {
@@ -379,28 +347,6 @@ public class GameManager : MonoBehaviour
                 {
                     trialResult = TrialType.RejInput;
                 }
-            }
-            else if (trialGoal == TrialType.RejInput)
-            {
-                trialResult = TrialType.RejInput;
-                // ignore the input.
-            }
-            else if (trialGoal == TrialType.AssistSuccess)
-            {
-                if (inputData.validity == InputValidity.Accepted)
-                {
-                    trialResult = TrialType.AssistSuccess;
-                    CloseInputWindow();
-                }
-                else
-                {
-                    trialResult = TrialType.RejInput;
-                }
-            }
-            else if (trialGoal == TrialType.AssistFail)
-            {
-                trialResult = TrialType.AssistFail;
-                // ignore the input.
             }
         }
         else if (windowExpired)

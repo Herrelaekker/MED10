@@ -160,6 +160,7 @@ public class SimBCIInput : MonoBehaviour
     }
 
     private void LogSample(string eventLabel) {
+        print("log sample");
         Dictionary<string, object> sampleLog = new Dictionary<string, object>() {
             {"Event", eventLabel},
             {"BCIConfidence", confidence},

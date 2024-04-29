@@ -26,6 +26,8 @@ public class SoundManager : MonoBehaviour
 
     public AudioSource conjuringSound;
 
+    public AudioSource placingSound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +41,11 @@ public class SoundManager : MonoBehaviour
     {
         conjuringSound.Play();
         StartCoroutine(StopConjuringSound());
+    }
+
+    public void PlayPlacingSound()
+    {
+        placingSound.Play();
     }
 
     IEnumerator StopConjuringSound()
@@ -83,9 +90,6 @@ public class SoundManager : MonoBehaviour
 
     public void OnGameDecision(GameDecisionData decisionData) {
         if (decisionData.decision == TrialType.AccInput) {
-            correctSound.Play();
-            soundState = SoundState.CorrectSound;
-        } else if (decisionData.decision == TrialType.FabInput) {
             correctSound.Play();
             soundState = SoundState.CorrectSound;
         } else {

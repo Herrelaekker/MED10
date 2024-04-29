@@ -83,7 +83,11 @@ public class BuildMode : MonoBehaviour
     
     [System.Serializable]
     public class OnStartConjureBlock : UnityEvent { }
-    public OnStartConjureBlock onStartConjureBlock;
+    public OnStartConjureBlock onStartConjureBlock;    
+
+    [System.Serializable]
+    public class OnBlockPlaced : UnityEvent { }
+    public OnBlockPlaced onBlockPlaced;
 
     List<GameObject> blue = new List<GameObject> ();
     List<GameObject> green = new List<GameObject> ();
@@ -393,6 +397,7 @@ public class BuildMode : MonoBehaviour
                 {
                     placingTimer = 0;
                     conjuredBlock.transform.parent = blockEndTrans;
+                    onBlockPlaced.Invoke();
 
                     /*if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
 
@@ -461,7 +466,7 @@ public class BuildMode : MonoBehaviour
 
         if (curPlacementType == PlacementType.Block)
         {
-            if (decisionData.decision != TrialType.AccInput && decisionData.decision != TrialType.FabInput)
+            if (decisionData.classification == MotorImageryEvent.Rest)
                 spriteRend.sprite = crackedWall;
             else if (decisionData.classification == MotorImageryEvent.GoldenMotorImagery)
                 spriteRend.sprite = goldenWall;

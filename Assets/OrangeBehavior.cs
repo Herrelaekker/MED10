@@ -31,10 +31,7 @@ public class OrangeBehavior : MonoBehaviour
         if (decisionData.decision == TrialType.AccInput) {
             ActivateSuccessFeedback();
             //Debug.Log("Showing Feedback from Real Input.");
-        } else if (decisionData.decision == TrialType.FabInput) {
-            ActivateSuccessFeedback();
-            //Debug.Log("Showing Feedback from Fabricated Input.");
-        } else {
+        }  else {
             StartCoroutine("Wrong");
         }
 
