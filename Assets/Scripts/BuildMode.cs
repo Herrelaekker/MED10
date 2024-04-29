@@ -399,14 +399,6 @@ public class BuildMode : MonoBehaviour
                     conjuredBlock.transform.parent = blockEndTrans;
                     onBlockPlaced.Invoke();
 
-                    /*if (IsArrayEmpty(posOptionBtns, buildingArea.size.x, buildingArea.size.y))
-
-                    {
-                        //GOTO Next phase
-                        DoneBuilding();
-                    }
-                    else*/
-
                     if (phaseManager.HaveEnoughMana(1))
                         SwitchState(BuildState.PickBlock);
                     else

@@ -208,9 +208,26 @@ public class GameManager : MonoBehaviour
                     MakeInputDecision(fabInputData, true);
                     alarmFired = true;
                 } else */if (inputWindowTimer > inputWindowSeconds) {
-                   //Debug.Log("inputWindow expired.");
+                    //Debug.Log("inputWindow expired.");
                     // The input window expired
+                    print("Best Input Data");
+                    if (bestInputData != null)
+                    {
+                        print(bestInputData.classification);
+                        print(bestInputData.validity);
+                    }
+                    print("NULL");
+
                     MakeInputDecision(bestInputData, true);
+
+                    print("2 Best Input Data");
+                    if (bestInputData != null)
+                    {
+                        print(bestInputData.classification);
+                        print(bestInputData.validity);
+                    }
+                    print("NULL");
+
                     bestInputData = null;
                     curClassification = MotorImageryEvent.Rest;
                     alarmFired = false;
@@ -336,21 +353,19 @@ public class GameManager : MonoBehaviour
         {
             classification = inputData.classification;
 
-           if (trialGoal == TrialType.AccInput)
+            if (inputData.validity == InputValidity.Accepted)
             {
-                if (inputData.validity == InputValidity.Accepted)
-                {
-                    trialResult = TrialType.AccInput;
-                    CloseInputWindow();
-                }
-                else
-                {
-                    trialResult = TrialType.RejInput;
-                }
+                trialResult = TrialType.AccInput;
+                CloseInputWindow();
+            }
+            else
+            {
+                CloseInputWindow();
             }
         }
-        else if (windowExpired)
+        else
         {
+            classification = MotorImageryEvent.Rest;
             CloseInputWindow();
         }
     }

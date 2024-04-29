@@ -7399,8 +7399,8 @@ MonoBehaviour:
   manaText: {fileID: 2089921438}
   bgAnimator: {fileID: 644593127}
   intensity: 2
-  BCIExercisesPerTriangle: 5
-  triangles: 1
+  BCIExercisesPerTriangle: 10
+  triangles: 3
   iterations: 1
   userChosenIntensityUI: {fileID: 654832561}
   manaAmountPerEnemy: 100
