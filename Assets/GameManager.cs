@@ -60,12 +60,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Trial Setup")]
 	[Tooltip("The total number of trials is calculated from the trial counts set here.")]
-    public int rejTrials = 5;
     public int accTrials = 10;
-    public int fabTrials = 5;
-    public int assistSuccessTrials = 0;
-    public int assistFailTrials = 0;
-    public int explicitShamTrials = 0;
 
     private int trialsTotal = -1;
     private int currentTrial = -1;
@@ -137,48 +132,6 @@ public class GameManager : MonoBehaviour
             trialsLeft = accTrials,
             behavior = UrnEntryBehavior.Persist
         };
-
-        mechanisms["FabInput"] = new Mechanism {
-            name = "FabInput",
-            trialType = TrialType.FabInput,
-            rate = 0f,
-            trials = fabTrials,
-            trialsLeft = fabTrials,
-            behavior = UrnEntryBehavior.Persist
-        };
-
-        mechanisms["RejInput"] = new Mechanism {
-            name = "RejInput",
-            trialType = TrialType.RejInput,
-            rate = 0f,
-            trials = rejTrials,
-            trialsLeft = rejTrials,
-            behavior = UrnEntryBehavior.Override
-        };
-        mechanisms["AssistSuccess"]  = new Mechanism {
-            name = "AssistSuccess",
-            trialType = TrialType.AssistSuccess,
-            rate = 0f,
-            trials = assistSuccessTrials,
-            trialsLeft = assistSuccessTrials,
-            behavior = UrnEntryBehavior.Persist
-        };
-        mechanisms["AssistFail"]  = new Mechanism {
-            name = "AssistFail",
-            trialType = TrialType.AssistFail,
-            rate = 0f,
-            trials = assistFailTrials,
-            trialsLeft = assistFailTrials,
-            behavior = UrnEntryBehavior.Persist
-        };
-        mechanisms["ExplicitSham"]  = new Mechanism {
-            name = "ExplicitSham",
-            trialType = TrialType.ExplicitSham,
-            rate = 0f,
-            trials = explicitShamTrials,
-            trialsLeft = explicitShamTrials,
-            behavior = UrnEntryBehavior.Persist
-        };
     }
 
     private void SetupUrn() {
@@ -195,9 +148,7 @@ public class GameManager : MonoBehaviour
 
     private void LogMeta() {
         Dictionary<string, object> metaLog = new Dictionary<string, object>() {
-            {"FabInputTrials", fabTrials},
             {"AccInputTrials", accTrials},
-            {"RejInputTrials", rejTrials},
             {"Trials", trialsTotal},
             {"InterTrialInterval_sec", interTrialIntervalSeconds},
             {"InputWindow_sec", inputWindowSeconds},
@@ -472,6 +423,11 @@ public class GameManager : MonoBehaviour
         interTrialIntervalSeconds = time;
         GameData gameData = createGameData();
         onGameStateChanged.Invoke(gameData);
+    }
+
+    public float GetInterTrialSeconds()
+    {
+        return interTrialIntervalSeconds;
     }
 
 }

@@ -25,7 +25,7 @@ public class SoundManager : MonoBehaviour
     public AudioSource buildBG, defendBG;
     float maxVolBuild, maxVolDefend;
 
-    public AudioClip conjuringSound;
+    public AudioSource conjuringSound;
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +39,14 @@ public class SoundManager : MonoBehaviour
 
     public void PlayConjuringSound()
     {
-        audioSource.PlayOneShot(conjuringSound, 0.75f);
+        conjuringSound.Play();
+        StartCoroutine(StopConjuringSound());
+    }
+
+    IEnumerator StopConjuringSound()
+    {
+        yield return new WaitForSeconds(5f);
+        conjuringSound.Stop();
     }
 
     public void SwapTrack(bool buildSound)

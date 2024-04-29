@@ -115,6 +115,8 @@ public class BuildMode : MonoBehaviour
 
     float orthoSize;
     float yPos;
+    GameManager gameManager;
+    float timeBeforeInputWindow;
 
     private void Start()
     {
@@ -122,6 +124,8 @@ public class BuildMode : MonoBehaviour
         switcher = camera.GetComponent<CinemachineSwitcher>();
         gridManager = FindObjectOfType<GridManager>();
         phaseManager = FindObjectOfType<PhaseManager>();
+        gameManager = FindObjectOfType<GameManager>();
+        timeBeforeInputWindow = gameManager.GetInterTrialSeconds();
 
         cellSize = FindFirstObjectByType<Grid>().cellSize.x;
         curHighestYPos = lowestYPos;
@@ -305,23 +309,29 @@ public class BuildMode : MonoBehaviour
     public void PickedBlock(GameObject block)
     {
         curPlacementType = PlacementType.Block;
-        StartConjuring(block);
+        PrepareConjuring(block);
     }
 
-    void StartConjuring(GameObject block)
+    void PrepareConjuring(GameObject block)
     {
         pickedBlock = block;
-        magicPE.SetActive(true);
         magicBurstPE.SetActive(false);
         magicTrailPE.SetActive(false);
-        onStartConjureBlock.Invoke();
         SwitchState(BuildState.Conjure);
+        StartCoroutine(ConjuringStarted(timeBeforeInputWindow));
+    }
+
+    IEnumerator ConjuringStarted(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        magicPE.SetActive(true);
+        onStartConjureBlock.Invoke();
     }
 
     public void PickedDecoration(GameObject block)
     {
         curPlacementType = PlacementType.Decoration;
-        StartConjuring(block);
+        PrepareConjuring(block);
 
     }
 
