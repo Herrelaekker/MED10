@@ -9,6 +9,13 @@ public enum SoundState {
     None
 }
 
+[System.Serializable]
+public class BackgroundSound
+{
+    public AudioSource track;
+    public float maxVol;
+}
+
 public class SoundManager : MonoBehaviour
 {
     [SerializeField]
@@ -19,10 +26,11 @@ public class SoundManager : MonoBehaviour
     private bool madeDecision = false;
 
 
-    AudioSource curTrack;
+    BackgroundSound[] curTrack;
 
-    public AudioSource buildBG, defendBG;
-    float maxVolBuild, maxVolDefend;
+    public BackgroundSound[] buildBG, defendBG;
+   // public AudioSource[] buildBG, defendBG;
+   // float maxVolBuild, maxVolDefend;
 
     public AudioSource conjuringSound;
 
@@ -32,9 +40,16 @@ public class SoundManager : MonoBehaviour
     void Start()
     {
         curTrack = defendBG;
-        defendBG.Play();
-        maxVolBuild = buildBG.volume;
-        maxVolDefend = defendBG.volume;
+
+        foreach (BackgroundSound bgSnd in defendBG)
+        {
+            bgSnd.track.Play();
+            bgSnd.maxVol = bgSnd.track.volume;
+        }
+        foreach (BackgroundSound bgSnd in buildBG)
+        {
+            bgSnd.maxVol = bgSnd.track.volume;
+        }
     }
 
     public void PlayConjuringSound()
@@ -58,32 +73,36 @@ public class SoundManager : MonoBehaviour
     {
         if (buildSound)
         {
-            StartCoroutine(FadeTrack(buildBG, maxVolDefend, maxVolBuild));
+            StartCoroutine(FadeTrack(buildBG));
         }else
         {
-            StartCoroutine(FadeTrack(defendBG, maxVolBuild, maxVolDefend));
+            StartCoroutine(FadeTrack(defendBG));
         }
     }
 
-    IEnumerator FadeTrack(AudioSource nextTrack, float curMaxVol, float nextMaxVol)
+    IEnumerator FadeTrack(BackgroundSound[] nextTrack)
     {
         float timeToFade = 1f;
         float timeElapsed = 0f;
 
         if (curTrack != nextTrack)
         {
-
-            nextTrack.Play();
+            foreach(BackgroundSound bgSnd in nextTrack)
+                bgSnd.track.Play();
 
             while(timeElapsed < timeToFade)
             {
-                curTrack.volume = Mathf.Lerp(curMaxVol, 0, timeElapsed / timeToFade);
-                nextTrack.volume = Mathf.Lerp(0, nextMaxVol, timeElapsed / timeToFade);
+                foreach (BackgroundSound bgSnd in curTrack)
+                    bgSnd.track.volume = Mathf.Lerp(bgSnd.maxVol, 0, timeElapsed / timeToFade);
+
+                foreach (BackgroundSound bgSnd in nextTrack)
+                    bgSnd.track.volume = Mathf.Lerp(0, bgSnd.maxVol, timeElapsed / timeToFade);
                 timeElapsed += Time.deltaTime;
                 yield return null;
             }
 
-            curTrack.Stop();
+            foreach (BackgroundSound bgSnd in curTrack)
+                bgSnd.track.Stop();
             curTrack = nextTrack;
         }
     }
