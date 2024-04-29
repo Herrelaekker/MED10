@@ -121,9 +121,12 @@ public class BuildMode : MonoBehaviour
     float yPos;
     GameManager gameManager;
     float timeBeforeInputWindow;
+    LoggingManager loggingManager;
 
     private void Start()
     {
+        loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
+
         camera = Camera.main;
         switcher = camera.GetComponent<CinemachineSwitcher>();
         gridManager = FindObjectOfType<GridManager>();
@@ -216,6 +219,24 @@ public class BuildMode : MonoBehaviour
             }
         }
     }
+    private void LogEvent(string eventLabel)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel},
+            {"BlockType" , curPlacementType}
+        };
+
+        loggingManager.Log("Game", gameLog);
+    }
+    private void LogBlockEvent(string eventLabel, PlacementType placementType)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel},
+            {"BlockType", placementType }
+        };
+
+        loggingManager.Log("Game", gameLog);
+    }
 
     public void SwitchState(BuildState newState)
     {
@@ -225,6 +246,8 @@ public class BuildMode : MonoBehaviour
         placeBlockUI.SetActive(false);
         backToDefendingBtn.SetActive(false);
 
+        loggingManager.SetBuildState(newState);
+        LogEvent("SwitchBuildState");
 
         switch (state)
         {
@@ -463,6 +486,9 @@ public class BuildMode : MonoBehaviour
             else if (decisionData.classification == MotorImageryEvent.GoldenMotorImagery)
                 spriteRend.sprite = goldenWall;
         }
+
+        
+        //LogBlockEvent("ConjureBlock", curPlacementType);
 
         SwitchState(BuildState.PlaceBlock);
         onBlockConjured.Invoke();

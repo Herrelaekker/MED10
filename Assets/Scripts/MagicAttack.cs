@@ -33,9 +33,13 @@ public class MagicAttack : MonoBehaviour
     public AudioSource spellSpawnSound;
     public AudioSource spellReadySound;
 
+    LoggingManager loggingManager;
+
     // Start is called before the first frame update
     void Start()
     {
+        loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
+
         waveSpawner = FindObjectOfType<WaveSpawner>();
         bounds = waveSpawner.GetYRange();
         col = attackCursor.GetComponentInChildren<Collider2D>();
@@ -44,6 +48,24 @@ public class MagicAttack : MonoBehaviour
         attackCursor.SetActive(false);
         explosionPE.transform.parent = attackCursor.transform;
         explosionPE.transform.localPosition = Vector3.zero;
+    }
+
+    private void LogEvent(string eventLabel)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel}
+        };
+
+        loggingManager.Log("Game", gameLog);
+    }
+    private void LogEnemiesKilledEvent(string eventLabel, float enemies)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel},
+            {"EnemiesKilled", enemies}
+        };
+
+        loggingManager.Log("Game", gameLog);
     }
 
     Vector3 GetScale(float yPos)
@@ -77,7 +99,8 @@ public class MagicAttack : MonoBehaviour
         followMouse = true;
         explosionPE.transform.parent = null;
         StartCoroutine(RemoveParticleEffect());
-    }
+        LogEnemiesKilledEvent("ProjectileDone", waveSpawner.GetEnemiesKilledOneShot());
+            }
 
     IEnumerator RemoveParticleEffect()
     {
@@ -92,6 +115,7 @@ public class MagicAttack : MonoBehaviour
         {
             projectilePE.SetActive(true);
             spellReadySound.Play();
+            LogEvent("ReadyToShoot");
         }
     }
 
@@ -122,6 +146,8 @@ public class MagicAttack : MonoBehaviour
     }
 
     void ShootProjectile() {
+        LogEvent("ShotProjectile");
+
         shootProjectile = true;
         projectilePE.SetActive(true);
         SetPoints(projectileStartTrans.position, attackCursor.transform.position);

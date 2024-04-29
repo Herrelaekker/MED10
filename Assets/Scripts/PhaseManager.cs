@@ -32,11 +32,13 @@ public class PhaseManager : MonoBehaviour
     public GameObject userChosenIntensityUI;
 
     public int manaAmountPerEnemy = 5;
-
+    LoggingManager loggingManager;
     SoundManager soundManager;
 
     private void Start()
     {
+        loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
+
         buildMode = FindObjectOfType<BuildMode>();
         battleMode = FindObjectOfType<BattleMode>();
         switcher = Camera.main.GetComponent<CinemachineSwitcher>();
@@ -86,6 +88,8 @@ public class PhaseManager : MonoBehaviour
 
     public void BattleTransitionDone()
     {
+        loggingManager.SetPhase("Defend");
+        LogEvent("SwitchPhase", "Defend");
         battleMode.StartBattle();
         switcher.SwitchState("Battle");
         magicAttack.EnableMagicAttack();
@@ -94,6 +98,8 @@ public class PhaseManager : MonoBehaviour
 
     public void BuildTransitionDone()
     {
+        loggingManager.SetPhase("Build");
+        LogEvent("SwitchPhase", "Build");
         buildMode.StartBuildMode();
         soundManager.SwapTrack(true);
 
@@ -108,6 +114,16 @@ public class PhaseManager : MonoBehaviour
         bgAnimator.SetInteger("Phase", 1);
         switcher.SwitchState("Build");
         magicAttack.DisableMagicAttack();
+    }
+
+    private void LogEvent(string eventLabel, string phase)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel},
+            {"Phase", phase}
+        };
+
+        loggingManager.Log("Game", gameLog);
     }
 
     public bool HaveEnoughMana(int mana)

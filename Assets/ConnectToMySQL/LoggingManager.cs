@@ -5,7 +5,7 @@ using System.IO;
 using System;
 using System.Linq;
 using System.Globalization;
-
+using TMPro;
 public enum LogMode {
     Append,
     Overwrite
@@ -60,6 +60,8 @@ public class LoggingManager : MonoBehaviour
     private string sessionID = "";
     private string deviceID = "";
     private string filestamp;
+
+    public TMP_Text manaText;
 
     // Start is called before the first frame update
     void Awake()
@@ -119,6 +121,19 @@ public class LoggingManager : MonoBehaviour
         collections.Add(collectionLabel, new LogCollection());
     }
 
+    string phase = "";
+
+    public void SetPhase(string phase)
+    {
+        this.phase = phase;
+    }
+
+    BuildState buildState;
+    public void SetBuildState(BuildState state)
+    {
+        buildState = state;
+    }
+
     public void Log(string collectionLabel, Dictionary<string, object> logData, LogMode logMode=LogMode.Append) {
         if (!collections.ContainsKey(collectionLabel)) {
             collections.Add(collectionLabel, new LogCollection());
@@ -140,6 +155,18 @@ public class LoggingManager : MonoBehaviour
                 if (!collections[collectionLabel].log.ContainsKey("Email")) {
                 collections[collectionLabel].log["Email"] = new Dictionary<int, object>();
                 }
+                if (!collections[collectionLabel].log.ContainsKey("Phase"))
+                {
+                    collections[collectionLabel].log["Phase"] = new Dictionary<int, object>();
+                }
+                if (!collections[collectionLabel].log.ContainsKey("BuildState"))
+                {
+                    collections[collectionLabel].log["BuildState"] = new Dictionary<int, object>();
+                }
+                if (!collections[collectionLabel].log.ContainsKey("Mana"))
+                {
+                    collections[collectionLabel].log["Mana"] = new Dictionary<int, object>();
+                }
             }
             int count = collections[collectionLabel].count;
             if (logMode == LogMode.Append) {
@@ -148,6 +175,13 @@ public class LoggingManager : MonoBehaviour
                     count = collections[collectionLabel].count;
                 }
             }
+
+            if (phase!= "")
+                collections[collectionLabel].log["Phase"][count] = phase;
+
+            collections[collectionLabel].log["BuildState"][count] = buildState;
+
+            collections[collectionLabel].log["Mana"][count] = manaText.text;
 
             collections[collectionLabel].log["Timestamp"][count] = GetTimeStamp();
             collections[collectionLabel].log["Framecount"][count] = GetFrameCount();
@@ -178,6 +212,18 @@ public class LoggingManager : MonoBehaviour
                 if (!collections[collectionLabel].log.ContainsKey("Email")) {
                 collections[collectionLabel].log["Email"] = new Dictionary<int, object>();
                 }
+            if (!collections[collectionLabel].log.ContainsKey("Phase"))
+            {
+                collections[collectionLabel].log["Phase"] = new Dictionary<int, object>();
+            }
+            if (!collections[collectionLabel].log.ContainsKey("BuildState"))
+            {
+                collections[collectionLabel].log["BuildState"] = new Dictionary<int, object>();
+            }
+            if (!collections[collectionLabel].log.ContainsKey("Mana"))
+            {
+                collections[collectionLabel].log["Mana"] = new Dictionary<int, object>();
+            }
         }
 
         int count = collections[collectionLabel].count;
@@ -187,6 +233,13 @@ public class LoggingManager : MonoBehaviour
                 count = collections[collectionLabel].count;
             }
         }
+
+        if (phase != "")
+            collections[collectionLabel].log["Phase"][count] = phase;
+
+        collections[collectionLabel].log["BuildState"][count] = buildState;
+
+        collections[collectionLabel].log["Mana"][count] = manaText.text;
 
         collections[collectionLabel].log["Timestamp"][count] = GetTimeStamp();
         collections[collectionLabel].log["Framecount"][count] = GetFrameCount();

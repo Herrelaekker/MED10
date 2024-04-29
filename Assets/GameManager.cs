@@ -62,7 +62,6 @@ public class GameManager : MonoBehaviour
     private int trialsTotal = -1;
     private int currentTrial = -1;
     private TrialType trialResult = TrialType.RejInput;
-    private TrialType trialGoal = TrialType.RejInput;
 
     private Dictionary<string, Mechanism> mechanisms = new Dictionary<string, Mechanism>();
 
@@ -102,6 +101,9 @@ public class GameManager : MonoBehaviour
 
     InputData bestInputData = null;
 
+    SimBCIInput fabBCIInput;
+    OpenBCIInput openBCIInput;
+
     void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -109,6 +111,9 @@ public class GameManager : MonoBehaviour
         SetupMechanisms();
         SetupUrn();
         LogMeta();
+
+        fabBCIInput = FindObjectOfType<SimBCIInput>();
+        openBCIInput = FindObjectOfType<OpenBCIInput>();
     }
 
     private void SetupMechanisms() {
@@ -158,8 +163,6 @@ public class GameManager : MonoBehaviour
             {"Event", eventLabel},
             {"InputWindow", System.Enum.GetName(typeof(InputWindowState), inputWindow)},
             {"InputWindowOrder", inputIndex},
-            {"InterTrialTimer", interTrialTimer},
-            {"InputWindowTimer", inputWindowTimer},
             {"GameState", System.Enum.GetName(typeof(GameState), gameState)},
         };
 
@@ -170,7 +173,6 @@ public class GameManager : MonoBehaviour
         }
 
         if (eventLabel == "GameDecision") {
-            gameLog["TrialGoal"] = trialGoal;
             gameLog["TrialResult"] = trialResult;
         } else {
             gameLog["TrialResult"] = "NA";
@@ -198,35 +200,10 @@ public class GameManager : MonoBehaviour
             } else if (inputWindow == InputWindowState.Open) {
                 //Debug.Log("inputwindow is open");
                 inputWindowTimer += Time.deltaTime;
-                /*if (alarmFired == false) {
-                   //Debug.Log("inputWindowTimer exceeded currentFabAlarm.");
-                    // Fire fabricated input (if scheduled).
-                    InputData fabInputData = new InputData {
-                        validity = InputValidity.Accepted,
-                        type = InputType.FabInput
-                    };
-                    MakeInputDecision(fabInputData, true);
-                    alarmFired = true;
-                } else */if (inputWindowTimer > inputWindowSeconds) {
-                    //Debug.Log("inputWindow expired.");
-                    // The input window expired
-                    print("Best Input Data");
-                    if (bestInputData != null)
-                    {
-                        print(bestInputData.classification);
-                        print(bestInputData.validity);
-                    }
-                    print("NULL");
+                
+                if (inputWindowTimer > inputWindowSeconds) {
 
                     MakeInputDecision(bestInputData, true);
-
-                    print("2 Best Input Data");
-                    if (bestInputData != null)
-                    {
-                        print(bestInputData.classification);
-                        print(bestInputData.validity);
-                    }
-                    print("NULL");
 
                     bestInputData = null;
                     curClassification = MotorImageryEvent.Rest;
@@ -239,10 +216,6 @@ public class GameManager : MonoBehaviour
         gameTimers.inputWindowTimer = inputWindowTimer;
         onGameTimeUpdate.Invoke(gameTimers);
     }
-
-    /*public void SetFabAlarmVariability() {
-        currentFabAlarm = UnityEngine.Random.Range(noInputReceivedFabAlarm-fabAlarmVariability, noInputReceivedFabAlarm+fabAlarmVariability);
-    }*/
 
     public GameData createGameData() {
             GameData gameData = new GameData();
@@ -312,7 +285,17 @@ public class GameManager : MonoBehaviour
             return;
         } else {
             if (inputData.classification == MotorImageryEvent.MotorImagery || inputData.classification == MotorImageryEvent.GoldenMotorImagery)
+            {
                 bestInputData = inputData;
+                if (fabBCIInput.enabled)
+                {
+                    fabBCIInput.SaveMI(curClassification);
+                }
+                if (openBCIInput.enabled)
+                {
+                    openBCIInput.SaveMI(curClassification);
+                }
+            }
             //MakeInputDecision(inputData);
         }
     }
@@ -323,6 +306,16 @@ public class GameManager : MonoBehaviour
         interTrialTimer = 0; //-= (inputWindowSeconds - inputWindowTimer);
         inputWindowTimer = 0f;
         onInputWindowChanged.Invoke(inputWindow);
+
+        if (fabBCIInput.enabled)
+        {
+            fabBCIInput.SaveMI(MotorImageryEvent.Rest);
+        }
+        if (openBCIInput.enabled)
+        {
+            openBCIInput.SaveMI(MotorImageryEvent.Rest);
+        }
+
         LogEvent("InputWindowChange");
 
         // store the input decision.
@@ -343,8 +336,17 @@ public class GameManager : MonoBehaviour
     }
 
     public void MakeInputDecision(InputData inputData = null, bool windowExpired = false) {
+
+        if (fabBCIInput.enabled)
+        {
+            fabBCIInput.LogMotorImageryEvent();
+        }
+        if (openBCIInput.enabled)
+        {
+            openBCIInput.LogMotorImageryEvent();
+        }
+
         string entry = urn.ReadEntry();
-        trialGoal = (TrialType) System.Enum.Parse(typeof(TrialType), entry);
         trialResult = TrialType.RejInput;
 
         print("trialresult " + trialResult);
@@ -356,18 +358,14 @@ public class GameManager : MonoBehaviour
             if (inputData.validity == InputValidity.Accepted)
             {
                 trialResult = TrialType.AccInput;
-                CloseInputWindow();
-            }
-            else
-            {
-                CloseInputWindow();
             }
         }
         else
         {
             classification = MotorImageryEvent.Rest;
-            CloseInputWindow();
         }
+
+        CloseInputWindow();
     }
 
     public void PauseTrial() {

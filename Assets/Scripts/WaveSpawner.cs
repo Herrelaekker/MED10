@@ -130,8 +130,18 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
+    public int GetEnemiesKilledOneShot()
+    {
+        int amount = enemiesKilledOneShot;
+        enemiesKilledOneShot = 0;
+
+        return amount;
+    }
+
+    int enemiesKilledOneShot = 0;
     public void EnemiesKilled(int amount)
     {
+        enemiesKilledOneShot += amount;
         if (deathAmount + amount <= maxDeathAmount)
         {
             deathTotal += amount;

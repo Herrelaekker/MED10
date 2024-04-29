@@ -7956,6 +7956,7 @@ MonoBehaviour:
   savePath: 
   filePrefix: log
   fileExtension: .csv
+  manaText: {fileID: 2089921438}
 --- !u!4 &644685912
 Transform:
   m_ObjectHideFlags: 0
@@ -17849,7 +17850,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ffd39e8e52af6f4a813ee9e802362be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeBeforeSpawning: 2
+  timeBeforeSpawning: 0.25
   timeBeforeBlowingAway: 1
   enemyPrefab: {fileID: 4825464696685723642, guid: 02bedcdc6c714454a9501005ef18abac,
     type: 3}

@@ -133,17 +133,35 @@ public class SimBCIInput : MonoBehaviour
         loggingManager.Log("Meta", metaLog);
     }
 
-    private void LogMotorImageryEvent(MotorImageryEvent miEvent = MotorImageryEvent.Rest, float lastConfidence = -1f) {
+    float[] consecThresholdBufferValSaved;
+    int inputNumberSaved;
+    BCIState bciStateSaved;
+    float confidenceSaved;
+    MotorImageryEvent miEventSaved;
+    public void SaveMI(MotorImageryEvent miEvent)
+    {
+        if (miEvent != MotorImageryEvent.Rest)
+            consecThresholdBufferValSaved = consecThresholdBufferVal;
+        inputNumberSaved = inputNumber;
+        bciStateSaved = bciState;
+        confidenceSaved = confidence;
+        miEventSaved = miEvent;
+    }
+
+    public void LogMotorImageryEvent()
+    {
         Dictionary<string, object> gameLog = new Dictionary<string, object>() {
-            {"Event", Enum.GetName(typeof(MotorImageryEvent), miEvent)},
-            {"BCIConfidence", lastConfidence},
-            {"BCIState", Enum.GetName(typeof(BCIState), bciState)},
-            {"InputNumber", inputNumber},
+            {"Event", Enum.GetName(typeof(MotorImageryEvent), miEventSaved)},
+            {"BCIConfidence", confidenceSaved},
+            {"BCIState", Enum.GetName(typeof(BCIState), bciStateSaved)},
+            {"InputNumber", inputNumberSaved},
         };
         loggingManager.Log("Game", gameLog);
-        if (bciProcessingMode == BCIProcessingMode.ConsecutiveThreshold) {
+        if (bciProcessingMode == BCIProcessingMode.ConsecutiveThreshold && miEventSaved != MotorImageryEvent.Rest)
+        {
             string buffer = "(";
-            foreach(float t in consecThresholdBufferVal) {
+            foreach (float t in consecThresholdBufferValSaved)
+            {
                 buffer += t.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) + " ";
             }
             buffer += ")";
@@ -235,7 +253,7 @@ public class SimBCIInput : MonoBehaviour
             inputData.classification = newClassification;
            //Array.Clear(consecThresholdBuffer, 0, consecThresholdBuffer.Length);
            inputData.inputNumber = inputNumber;
-           LogMotorImageryEvent(newClassification, confidence);
+           //LogMotorImageryEvent(newClassification, confidence);
            Debug.Log("Motor Imagery!");
            onBCIMotorImagery.Invoke(newClassification);
            onInputFinished.Invoke(inputData);
