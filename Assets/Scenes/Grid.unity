@@ -317,6 +317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   accTrials: 90
+  rejTrials: 0
   noInputReceivedFabAlarm: 3
   fabAlarmVariability: 1.9
   interTrialIntervalSeconds: 3
@@ -18744,7 +18745,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: a092e4f123fc91349b1aa6689d93ce50, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 3f50eeb3c86f8fb43a4f95afa20b90ee, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.494
   m_Pitch: 1

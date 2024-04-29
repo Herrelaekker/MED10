@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
     [Header("Trial Setup")]
 	[Tooltip("The total number of trials is calculated from the trial counts set here.")]
     public int accTrials = 10;
+    public int rejTrials = 0;
 
     private int trialsTotal = -1;
     private int currentTrial = -1;
@@ -131,6 +132,15 @@ public class GameManager : MonoBehaviour
             trials = accTrials,
             trialsLeft = accTrials,
             behavior = UrnEntryBehavior.Persist
+        };
+        mechanisms["RejInput"] = new Mechanism
+        {
+            name = "RejInput",
+            trialType = TrialType.RejInput,
+            rate = 0f,
+            trials = rejTrials,
+            trialsLeft = rejTrials,
+            behavior = UrnEntryBehavior.Override
         };
     }
 
