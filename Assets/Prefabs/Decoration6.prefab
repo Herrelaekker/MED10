@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1578189213442995563}
   - component: {fileID: 9194104296207166406}
-  - component: {fileID: -4182860290018434263}
+  - component: {fileID: -2246862199432852779}
   m_Layer: 0
-  m_Name: Decoration2
+  m_Name: Decoration6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   m_LocalScale: {x: 2.96875, y: 2.96875, z: 2.96875}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 1497059572048585532}
+  - {fileID: 2206543517212808244}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &9194104296207166406
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 7a35d6f197661db44b0eb07d06a70a82, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a089fad8a7ef24c48b283343e0e4f314, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -86,7 +86,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-4182860290018434263
+--- !u!114 &-2246862199432852779
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -98,9 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e87358f5caa32824e8c2c58572a6a00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crackedSprite: {fileID: 21300000, guid: 6ff4a6151d8f51e4ea1b46d9e5e42159, type: 3}
-  goldenEffect: {fileID: 6249596595145373774}
---- !u!1001 &8932475561184773069
+  crackedSprite: {fileID: 21300000, guid: 0af24cab7e04a00469049bf8db793869, type: 3}
+  goldenEffect: {fileID: 6693104278426718022}
+--- !u!1001 &8191818124880917701
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -108,6 +108,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1578189213442995563}
     m_Modifications:
+    - target: {fileID: 2289158898645297040, guid: 4d41c86ba79e339419fb3b19c2273ddd,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3264408033226636163, guid: 4d41c86ba79e339419fb3b19c2273ddd,
         type: 3}
       propertyPath: m_Name
@@ -168,15 +173,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d41c86ba79e339419fb3b19c2273ddd, type: 3}
---- !u!4 &1497059572048585532 stripped
+--- !u!4 &2206543517212808244 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8011930734900748529, guid: 4d41c86ba79e339419fb3b19c2273ddd,
     type: 3}
-  m_PrefabInstance: {fileID: 8932475561184773069}
+  m_PrefabInstance: {fileID: 8191818124880917701}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6249596595145373774 stripped
+--- !u!1 &6693104278426718022 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3264408033226636163, guid: 4d41c86ba79e339419fb3b19c2273ddd,
     type: 3}
-  m_PrefabInstance: {fileID: 8932475561184773069}
+  m_PrefabInstance: {fileID: 8191818124880917701}
   m_PrefabAsset: {fileID: 0}

@@ -123,6 +123,14 @@ public class BuildMode : MonoBehaviour
     float timeBeforeInputWindow;
     LoggingManager loggingManager;
 
+    public Transform decorationsTrans;
+    GameObject[] greyOverlays;
+
+    public Transform characterUITrans;
+    public GameObject character;
+    Transform characterStartTrans;
+    public Vector3 characterInitialLocalPos;
+
     private void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -138,6 +146,25 @@ public class BuildMode : MonoBehaviour
         curHighestYPos = lowestYPos;
 
         UpdateBuildingCamera(curHighestYPos);
+
+        List<GameObject> greyOverlayList = new List<GameObject>();
+        foreach (Transform child in decorationsTrans.transform)
+        {
+            foreach(Transform grandChild in child)
+            if (grandChild.name == "greyoverlay")
+            {
+                greyOverlayList.Add(grandChild.gameObject);
+            }
+        }
+        greyOverlays = greyOverlayList.ToArray();
+        characterInitialLocalPos = character.transform.localPosition;
+        characterStartTrans = character.transform.parent;
+    }
+
+    void GreyOutDecorations(bool greyOut)
+    {
+        foreach (GameObject go in greyOverlays) { go.SetActive(greyOut); }
+
     }
     
     public void NoMoreDefending()
@@ -147,6 +174,8 @@ public class BuildMode : MonoBehaviour
 
     public void StartBuildMode()
     {
+        character.transform.parent = characterUITrans;
+        character.transform.localPosition = Vector3.zero;
         SwitchState(BuildState.PickBlock);
     }
 
@@ -160,6 +189,8 @@ public class BuildMode : MonoBehaviour
         posDecorationBtns = new GameObject[bounds.size.x, bounds.size.y];
 
         Vector3Int origin = bounds.position;
+
+        bool noGreen = true;
 
         for (int x = 0;x < bounds.size.x; x++)
         {
@@ -194,6 +225,7 @@ public class BuildMode : MonoBehaviour
 
                 }else if (tile.name == "green")
                 {
+                    noGreen = false;
                     var block = Instantiate(posOptionBtnPrefab, placeBlockUI.transform);
                     Button button = block.GetComponent<Button>();
                     block.name = "Green";
@@ -218,6 +250,7 @@ public class BuildMode : MonoBehaviour
                 }
             }
         }
+        GreyOutDecorations(noGreen);
     }
     private void LogEvent(string eventLabel)
     {
@@ -258,6 +291,7 @@ public class BuildMode : MonoBehaviour
                 playerCharAnimator.SetBool("PickedPlacement", true);
                 break;
             case BuildState.PickBlock:
+
                 PickBlockStart();
                 playerCharAnimator.SetBool("PickedPlacement", false);
                 
@@ -431,8 +465,12 @@ public class BuildMode : MonoBehaviour
         }
     }
 
+
+
     public void DoneBuilding()
     {
+        character.transform.parent = characterStartTrans;
+        character.transform.localPosition = characterInitialLocalPos;
         SwitchState(BuildState.None);
         onBuildEnd.Invoke();
     }
@@ -478,19 +516,14 @@ public class BuildMode : MonoBehaviour
 
         SpriteRenderer spriteRend = conjuredBlock.GetComponent<SpriteRenderer>();
         spriteRend.sortingLayerName = "Wall";
-
-        if (curPlacementType == PlacementType.Block)
-        {
-            if (decisionData.classification == MotorImageryEvent.Rest)
-                spriteRend.sprite = crackedWall;
-            else if (decisionData.classification == MotorImageryEvent.GoldenMotorImagery)
-                spriteRend.sprite = goldenWall;
-        }
-
         
         //LogBlockEvent("ConjureBlock", curPlacementType);
 
         SwitchState(BuildState.PlaceBlock);
         onBlockConjured.Invoke();
+
+        Block block = conjuredBlock.GetComponent<Block>();
+        block.ChangeSprite(decisionData.classification);
+        //block.transform.GetChild(0).localPosition = Vector3.zero;
     }
 }

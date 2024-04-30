@@ -213,6 +213,7 @@ public class GridManager : MonoBehaviour
         print("Place block");
         recentlyClaimedArea = area;
         BoundsInt areaAboveBuilding = new BoundsInt(new Vector3Int(area.xMin, area.yMax, 0), new Vector3Int(area.xMax - area.xMin, 1, 1));
+        BoundsInt areaBelowBuilding = new BoundsInt(new Vector3Int(area.xMin, area.yMin-1, 0), new Vector3Int(area.xMax - area.xMin, 1, 1));
         BoundsInt areaLeft = new BoundsInt(new Vector3Int(area.xMin - 1, area.yMin, 0), new Vector3Int(1, area.yMax - area.yMin, 1));
         BoundsInt areaRight = new BoundsInt(new Vector3Int(area.xMax, area.yMin, 0), new Vector3Int(1, area.yMax - area.yMin, 1));
         SetTilesBlock(area, TileType.Empty, tempTilemap);
@@ -220,6 +221,9 @@ public class GridManager : MonoBehaviour
         if (CanTakeArea(areaAboveBuilding))
         {
             SetTilesBlock(areaAboveBuilding, TileType.Blue, mainTilemap);
+        }
+        if (CanTakeArea(areaBelowBuilding)){
+            SetTilesBlock(areaBelowBuilding, TileType.Blue, mainTilemap);
         }
         if (CanTakeArea(areaLeft))
         {
