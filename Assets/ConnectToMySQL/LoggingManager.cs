@@ -385,6 +385,11 @@ public class LoggingManager : MonoBehaviour
         }
     }
 
+    public string GetFileStamp()
+    {
+        return filestamp;
+    }
+
     // Returns a time stamp including the milliseconds.
     private string GetTimeStamp()
     {

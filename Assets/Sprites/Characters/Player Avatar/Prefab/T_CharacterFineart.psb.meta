@@ -53,9 +53,9 @@ ScriptedImporter:
     filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 2
+    wrapV: 2
+    wrapW: 2
     normalMap: 0
     textureFormat: 0
     maxTextureSize: 0
@@ -659,10 +659,10 @@ ScriptedImporter:
   - name: DefaultTexturePlatform
     overridden: 0
     ignorePlatformSupport: 0
-    maxTextureSize: 8192
+    maxTextureSize: 16384
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     forceMaximumCompressionQuality_BC6H_BC7: 0
     crunchedCompression: 0
@@ -1639,7 +1639,7 @@ ScriptedImporter:
     isGroup: 0
     importLayer: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638484428922594852
+  platformSettingsDirtyTick: 638501528680793473
   spriteSizeExpandChanged: 0
   generateGOHierarchy: 0
   textureAssetName: 

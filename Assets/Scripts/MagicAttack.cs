@@ -179,7 +179,7 @@ public class MagicAttack : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0) && !coolingDown)
+        if (Input.GetMouseButtonUp(0) && !coolingDown)
         {
             followMouse = false;
             coolingDown = true;
@@ -195,7 +195,7 @@ public class MagicAttack : MonoBehaviour
             mousePos.z = 0;
             Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(mousePos);
 
-            if (worldMousePosition.y < bounds.y && worldMousePosition.y > bounds.x)
+            if (worldMousePosition.y < bounds.y && worldMousePosition.y > bounds.x && Input.GetMouseButton(0))
             {
                 if (!attackCursor.activeSelf)
                     attackCursor.SetActive(true);

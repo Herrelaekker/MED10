@@ -131,6 +131,8 @@ public class BuildMode : MonoBehaviour
     Transform characterStartTrans;
     public Vector3 characterInitialLocalPos;
 
+    int blocksConjuredTotal = 0;
+
     private void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -456,7 +458,14 @@ public class BuildMode : MonoBehaviour
                     conjuredBlock.transform.parent = blockEndTrans;
                     onBlockPlaced.Invoke();
 
-                    if (phaseManager.HaveEnoughMana(1))
+                    if (phaseManager.BeenThroughEnoughExercises(blocksConjuredTotal))
+                    {
+                        character.SetActive(false);
+                        magicTrailPE.SetActive(false);
+                        SwitchState(BuildState.None);
+                        phaseManager.DoneWithVersion();
+                    }
+                    else if (phaseManager.HaveEnoughMana(1))
                         SwitchState(BuildState.PickBlock);
                     else
                         DoneBuilding();
@@ -505,6 +514,7 @@ public class BuildMode : MonoBehaviour
     public void ConjureStone(GameDecisionData decisionData)//bool correctlyConjured)
     {
         conjureTimer = 0;
+        blocksConjuredTotal++;
         conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
         conjuredBlock.transform.parent = null;
 

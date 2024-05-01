@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.IO;
+using System;
 
 public enum Intensity { 
-    Low,
-    High,
-    UserChosen
+A, B, C
 }
 
 public class PhaseManager : MonoBehaviour
@@ -33,11 +33,29 @@ public class PhaseManager : MonoBehaviour
 
     public int manaAmountPerEnemy = 5;
     LoggingManager loggingManager;
-    SoundManager soundManager;
+    SoundManager soundManager; 
+    GameManager gameManager;
+    int maxBCIExercises = 0;
+
+    public GameObject doneUI;
+
+    string filestamp;
+
+    // Update is called once per frame
+    void TakeScreenshot(string screenshotName)
+    {
+        ScreenCapture.CaptureScreenshot(Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments),"screenshot"+ filestamp + screenshotName + ".png"));
+        Debug.Log("Screenshot Captured");
+    }
 
     private void Start()
     {
+        doneUI.SetActive(false);
+
+        gameManager = FindObjectOfType<GameManager>();
+
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
+        filestamp = loggingManager.GetFileStamp();
 
         buildMode = FindObjectOfType<BuildMode>();
         battleMode = FindObjectOfType<BattleMode>();
@@ -46,17 +64,19 @@ public class PhaseManager : MonoBehaviour
         waveSpawner = FindObjectOfType<WaveSpawner>();
         soundManager = FindObjectOfType<SoundManager>();
 
-        if (intensity == Intensity.Low)
+        maxBCIExercises = BCIExercisesPerTriangle * triangles * iterations;
+
+        if (intensity == Intensity.A)
         {
             maxManaPerPhase = BCIExercisesPerTriangle;
             waveSpawner.SetEnemyAmount(BCIExercisesPerTriangle);
         }
-        else if (intensity == Intensity.High)
+        else if (intensity == Intensity.B)
         {
             maxManaPerPhase = BCIExercisesPerTriangle * triangles;
             waveSpawner.SetEnemyAmount(triangles * BCIExercisesPerTriangle);
         }
-        else if (intensity == Intensity.UserChosen)
+        else if (intensity == Intensity.C)
         {
 
             maxManaPerPhase = BCIExercisesPerTriangle * triangles * iterations;
@@ -124,6 +144,24 @@ public class PhaseManager : MonoBehaviour
         };
 
         loggingManager.Log("Game", gameLog);
+    }
+
+    public void DoneWithVersion()
+    {
+        TakeScreenshot("test");
+        StartCoroutine(WaitAfterScreenshot());
+    }
+
+    IEnumerator WaitAfterScreenshot()
+    {
+        yield return new WaitForSeconds(2);
+        doneUI.SetActive(true);
+        gameManager.EndGame();
+    }
+
+    public bool BeenThroughEnoughExercises(int exerciseAmount)
+    {
+        return (exerciseAmount >= maxBCIExercises);
     }
 
     public bool HaveEnoughMana(int mana)

@@ -188,15 +188,13 @@ public class GameManager : MonoBehaviour
             if (inputWindow == InputWindowState.Closed) {
                 alarmFired = false;
                 interTrialTimer += Time.deltaTime;
-                if (interTrialTimer > interTrialIntervalSeconds && currentTrial < trialsTotal) {
+                if (interTrialTimer > interTrialIntervalSeconds) { // && currentTrial < trialsTotal) {
                     interTrialTimer = 0f;
                     inputWindow = InputWindowState.Open;
                     //SetFabAlarmVariability();
                     onInputWindowChanged.Invoke(inputWindow);
                     LogEvent("InputWindowChange");
-                } else if (interTrialTimer > interTrialIntervalSeconds) {
-                    EndGame();
-                }
+                } 
             } else if (inputWindow == InputWindowState.Open) {
                 //Debug.Log("inputwindow is open");
                 inputWindowTimer += Time.deltaTime;
