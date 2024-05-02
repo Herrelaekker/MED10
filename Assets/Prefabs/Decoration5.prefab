@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 0742d4abadbf3f1429dae80fbd5207d2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 313c336fbfc25de46a9b1e3689acb4e9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -98,4 +98,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   crackedSprite: {fileID: 21300000, guid: e9de4ffbfdbbb174087023425f6176d0, type: 3}
-  goldenSprite: {fileID: 21300000, guid: 866fe533588c46d45b4f4927fbf69ae0, type: 3}
+  goldenSprite: {fileID: 21300000, guid: 0742d4abadbf3f1429dae80fbd5207d2, type: 3}

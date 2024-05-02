@@ -2,6 +2,9 @@ using Cinemachine;
 using ExternalPropertyAttributes;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Tilemaps;
@@ -42,8 +45,8 @@ public class BuildMode : MonoBehaviour
 
     public GameObject posOptionBtnPrefab;
 
-    GameObject[,] posOptionBtns;
-    GameObject[,] posDecorationBtns;
+    List<GameObject> posOptionBtns = new List<GameObject>();
+    List<GameObject> posDecorationBtns = new List<GameObject>();
     BoundsInt buildingArea;
     BoundsInt bounds;
 
@@ -133,6 +136,24 @@ public class BuildMode : MonoBehaviour
 
     int blocksConjuredTotal = 0;
 
+    public float pickBlockMaxTime = 10;
+    public float pickBlockMinTime = 4;
+    public float pickBlockShowTime = 5f;
+    bool pickBlockReachedMinTime;
+    float pickBlockTimer;
+    public float placeBlockMaxTime = 10;
+    public float placeBlockMinTime = 4;
+    public float placeBlockShowTime = 5f;
+    bool placeBlockReachedMinTime;
+    float placeBlockTimer;
+
+    public GameObject spriteBCIHand;
+
+
+    public GameObject[] blockPrefabs;
+
+    public TMP_Text timerText;
+
     private void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -161,6 +182,7 @@ public class BuildMode : MonoBehaviour
         greyOverlays = greyOverlayList.ToArray();
         characterInitialLocalPos = character.transform.localPosition;
         characterStartTrans = character.transform.parent;
+        spriteBCIHand.SetActive(false);
     }
 
     void GreyOutDecorations(bool greyOut)
@@ -187,8 +209,8 @@ public class BuildMode : MonoBehaviour
 
         TileBase[] allTiles = tilemap.GetTilesBlock(bounds);
 
-        posOptionBtns = new GameObject[bounds.size.x, bounds.size.y];
-        posDecorationBtns = new GameObject[bounds.size.x, bounds.size.y];
+        posOptionBtns = new List<GameObject>();//new GameObject[bounds.size.x, bounds.size.y];
+        posDecorationBtns = new List<GameObject>();//new GameObject[bounds.size.x, bounds.size.y];
 
         Vector3Int origin = bounds.position;
 
@@ -222,7 +244,8 @@ public class BuildMode : MonoBehaviour
                     block.transform.localScale = new Vector3(blockScale, blockScale, blockScale);
 
                     //block.transform.anchoredPosition = worldPos;
-                    posOptionBtns[x, y] = block;
+                    //posOptionBtns[x, y] = block;
+                    posOptionBtns.Add(block);
                     blue.Add(block);
 
                 }else if (tile.name == "green")
@@ -247,7 +270,8 @@ public class BuildMode : MonoBehaviour
                     block.transform.localScale = new Vector3(blockScale, blockScale, blockScale);
 
                     //block.transform.anchoredPosition = worldPos;
-                    posDecorationBtns[x, y] = block;
+                    //posDecorationBtns[x, y] = block;
+                    posDecorationBtns.Add(block);   
                     green.Add(block);   
                 }
             }
@@ -263,15 +287,6 @@ public class BuildMode : MonoBehaviour
 
         loggingManager.Log("Game", gameLog);
     }
-    private void LogBlockEvent(string eventLabel, PlacementType placementType)
-    {
-        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
-            {"Event", eventLabel},
-            {"BlockType", placementType }
-        };
-
-        loggingManager.Log("Game", gameLog);
-    }
 
     public void SwitchState(BuildState newState)
     {
@@ -280,6 +295,8 @@ public class BuildMode : MonoBehaviour
         pickBlockUI.SetActive(false);
         placeBlockUI.SetActive(false);
         backToDefendingBtn.SetActive(false);
+        timerText.gameObject.SetActive(false);
+        spriteBCIHand.SetActive(false);
 
         loggingManager.SetBuildState(newState);
         LogEvent("SwitchBuildState");
@@ -287,12 +304,14 @@ public class BuildMode : MonoBehaviour
         switch (state)
         {
             case BuildState.Conjure:
+                spriteBCIHand.SetActive(true);
                 playerCharAnimator.SetBool("PickedBlock", true);
                 break;
             case BuildState.BlockPlaceTransition:
                 playerCharAnimator.SetBool("PickedPlacement", true);
                 break;
             case BuildState.PickBlock:
+                pickBlockTimer = pickBlockMaxTime - placingTime;
 
                 PickBlockStart();
                 playerCharAnimator.SetBool("PickedPlacement", false);
@@ -303,6 +322,8 @@ public class BuildMode : MonoBehaviour
                 pickBlockUI.SetActive(true);
                 break;
             case BuildState.PlaceBlock:
+                
+                placeBlockTimer = placeBlockMaxTime;
                 playerCharAnimator.SetBool("PickedBlock", false);
                 Sprite sprite = conjuredBlock.GetComponent<SpriteRenderer>().sprite;
                 switch (curPlacementType)
@@ -336,7 +357,13 @@ public class BuildMode : MonoBehaviour
     {
         placeBlockUI.SetActive(false);
 
-        for (int y = 0; y < bounds.size.y; y++)
+        foreach (var pos in posOptionBtns)
+            pos.gameObject.SetActive(false);        
+        
+        foreach (var pos in posDecorationBtns)
+            pos.gameObject.SetActive(false);
+
+        /*for (int y = 0; y < bounds.size.y; y++)
         {
             for (int x = 0; x < bounds.size.x; x++)
             {
@@ -349,14 +376,21 @@ public class BuildMode : MonoBehaviour
                     posOptionBtns[x, y].SetActive(false);
                 }
             }
-        }
+        }*/
     }
 
-    void ShowPositions(GameObject[,] posOptions, Sprite sprite)
+    void ShowPositions(List<GameObject> posOptions, Sprite sprite)
     {
         HidePositons();
-        placeBlockUI.SetActive(true );
-        for (int y = 0; y < bounds.size.y; y++)
+        placeBlockUI.SetActive(true);
+
+        foreach(var pos in posOptions)
+        {
+            pos.gameObject.SetActive(true); 
+            pos.GetComponent<Image>().sprite = sprite;
+        }
+
+        /*for (int y = 0; y < bounds.size.y; y++)
         {
             for (int x = 0; x < bounds.size.x; x++)
             {
@@ -366,20 +400,29 @@ public class BuildMode : MonoBehaviour
                     posOptions[x, y].GetComponent<Image>().sprite = sprite;
                 }
             }
-        }
+        }*/
     }
 
     public void PickedBlock(GameObject block)
     {
         curPlacementType = PlacementType.Block;
-        PrepareConjuring(block);
+
+        StartCoroutine(PrepareConjuring(block));
     }
 
-    void PrepareConjuring(GameObject block)
+    IEnumerator PrepareConjuring(GameObject block)
     {
-        pickedBlock = block;
         magicBurstPE.SetActive(false);
         magicTrailPE.SetActive(false);
+        pickBlockUI.SetActive(false);
+        HidePositons();
+        
+        yield return new WaitUntil(() => pickBlockReachedMinTime);
+
+        gameManager.ResumeTrial();
+
+        pickBlockReachedMinTime = false;
+        pickedBlock = block;
         SwitchState(BuildState.Conjure);
         StartCoroutine(ConjuringStarted(timeBeforeInputWindow));
     }
@@ -394,8 +437,7 @@ public class BuildMode : MonoBehaviour
     public void PickedDecoration(GameObject block)
     {
         curPlacementType = PlacementType.Decoration;
-        PrepareConjuring(block);
-
+        StartCoroutine(PrepareConjuring(block));
     }
 
     public void ChoseBlockPlacement()
@@ -425,6 +467,25 @@ public class BuildMode : MonoBehaviour
 
     }
 
+    string GetTimerText(float timer) {
+        return Mathf.CeilToInt(timer).ToString();
+    }
+
+    void ChooseRandomPlacement()
+    {
+        if (curPlacementType == PlacementType.Block)
+        {
+            int rndIndex = Random.Range(0, posOptionBtns.Count);
+            posOptionBtns[rndIndex].GetComponent<Button>().onClick.Invoke();
+        }
+        else if (curPlacementType == PlacementType.Decoration)
+        {
+            int rndIndex = Random.Range(0, posDecorationBtns.Count);
+            posDecorationBtns[rndIndex].GetComponent<Button>().onClick.Invoke();
+        }
+        
+    }
+
     private void FixedUpdate()
     {
         if (updatingCamera)
@@ -444,9 +505,45 @@ public class BuildMode : MonoBehaviour
             }
         }
 
-
         switch (state)
         {
+            case BuildState.PickBlock:
+                pickBlockTimer -= Time.fixedDeltaTime;
+                timerText.text = GetTimerText(pickBlockTimer);
+                if (!pickBlockReachedMinTime && pickBlockMaxTime - pickBlockTimer > pickBlockMinTime)
+                {
+                    pickBlockReachedMinTime = true;
+                }
+
+                if (pickBlockMaxTime - pickBlockTimer > pickBlockShowTime)
+                {
+                    timerText.gameObject.SetActive(true);
+                }
+
+                if (pickBlockTimer <= 0)
+                {
+                    int rndIndex = Random.Range(0, blockPrefabs.Length);
+                    PickedBlock(blockPrefabs[rndIndex]);
+                }
+                break;           
+            case BuildState.PlaceBlock:
+                placeBlockTimer -= Time.fixedDeltaTime;
+                timerText.text = GetTimerText(placeBlockTimer);
+                if (!placeBlockReachedMinTime && placeBlockMaxTime - placeBlockTimer > placeBlockMinTime)
+                {
+                    placeBlockReachedMinTime = true;
+                }
+
+                if (placeBlockMaxTime - placeBlockTimer > placeBlockShowTime)
+                {
+                    timerText.gameObject.SetActive(true);
+                }
+
+                if (placeBlockTimer <= 0)
+                {
+                    ChooseRandomPlacement();
+                }
+                break;
             case BuildState.BlockPlaceTransition:
                 placingTimer += Time.fixedDeltaTime;
                 float t = placingTimer / placingTime;
@@ -474,7 +571,13 @@ public class BuildMode : MonoBehaviour
         }
     }
 
-
+    public void HideUIHand(InputWindowState inputWindow)
+    {
+        if (inputWindow == InputWindowState.Open)
+        {
+            spriteBCIHand.SetActive(false);
+        }
+    }
 
     public void DoneBuilding()
     {
@@ -484,8 +587,11 @@ public class BuildMode : MonoBehaviour
         onBuildEnd.Invoke();
     }
 
-    void PositionChosen(Vector2Int gridPos, PlacementType type)
+    IEnumerator StartPlacing(Vector2Int gridPos, PlacementType type)
     {
+        placeBlockUI.SetActive(false);
+
+        yield return new WaitUntil(() => placeBlockReachedMinTime);
         print(gridPos);
         //Destroy(posOptionBtns[gridPos.x, gridPos.y]);
 
@@ -498,17 +604,25 @@ public class BuildMode : MonoBehaviour
             if (btn != null)
                 Destroy(btn);
 
+        posOptionBtns.Clear();
+        posDecorationBtns.Clear();
+
         if (type == PlacementType.Block)
             gridManager.TakeBlockArea(new BoundsInt(new Vector3Int(gridPos.x, gridPos.y, 0), Vector3Int.one));
         else
             gridManager.TakeDecorationArea(new BoundsInt(new Vector3Int(gridPos.x, gridPos.y, 0), Vector3Int.one));
 
         Vector3 origin = buildingArea.position;
-        Vector3 worldPos = origin + new Vector3(gridPos.x * cellSize + offsetBlock.x, gridPos.y *cellSize+ offsetBlock.y, 0);
+        Vector3 worldPos = origin + new Vector3(gridPos.x * cellSize + offsetBlock.x, gridPos.y * cellSize + offsetBlock.y, 0);
         placingBlockEndPos = worldPos;
 
         placingBlockStartPos = conjuredBlock.transform.position;
         SwitchState(BuildState.BlockPlaceTransition);
+    }
+
+    void PositionChosen(Vector2Int gridPos, PlacementType type)
+    {
+        StartCoroutine(StartPlacing(gridPos, type));
     }
 
     public void ConjureStone(GameDecisionData decisionData)//bool correctlyConjured)
