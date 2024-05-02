@@ -148,6 +148,7 @@ public class WaveSpawner : MonoBehaviour
         }
         deathAmount += amount;
 
+        if(!blowAway)
         backToBuildingBtn.SetActive(true);
         onEnemiesKilled.Invoke(amount);
 
@@ -192,8 +193,6 @@ public class WaveSpawner : MonoBehaviour
 
     public void StartSpawning()
     {
-        if (phaseManager.HaveEnoughMana(1))
-            backToBuildingBtn.SetActive(true) ;
         isActive = true;
         timer = 0;
         enemySpawnCounter = 0;

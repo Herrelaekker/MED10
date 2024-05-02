@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -28,10 +29,13 @@ public class Enemy : MonoBehaviour
 
     public AudioSource spawnSound;
     public AudioSource deathSound;
+    public AnimationCurve animationCurve;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
+        animationCurve.postWrapMode = WrapMode.Once;
+
     }
     public void PlaySpawnSound()
     {
@@ -131,7 +135,7 @@ public class Enemy : MonoBehaviour
         if (!blownAway) 
         {
             timer += Time.fixedDeltaTime;
-            float t = timer / timeBeforeReachingGoal;
+            float t = animationCurve.Evaluate(timer / timeBeforeReachingGoal);
             transform.position = Vector3.Lerp(startPoint, goalPoint, t);
             
             transform.localScale = GetScale(transform.position.y);

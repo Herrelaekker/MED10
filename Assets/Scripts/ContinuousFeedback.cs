@@ -2,11 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class Particle
+{
+    public ParticleSystem particleSystem;
+    public float minScale = .25f;
+    public float maxScale = .5f;
+}
+
 public class ContinuousFeedback : MonoBehaviour
 {
     float confidence = -1;
 
-    public ParticleSystem[] particles;
+    public Particle[] particles;
     ParticleSystem.MainModule[] psMains;
     bool isActive = true;
 
@@ -16,9 +24,6 @@ public class ContinuousFeedback : MonoBehaviour
 
     [SerializeField]
     private Gradient gradient = new Gradient();
-
-    public float minScale = .25f, maxScale = .5f;
-    float curScaleVal;
 
     private void Start()
     {
@@ -38,9 +43,7 @@ public class ContinuousFeedback : MonoBehaviour
         print(classficationThreshold);
         psMains = new ParticleSystem.MainModule[particles.Length];
         for ( int i = 0; i < psMains.Length; i++)
-            psMains[i] = particles[i].main;
-
-        curScaleVal = minScale;
+            psMains[i] = particles[i].particleSystem.main;
     }
 
     public void SetConfidence(float confidence)
@@ -78,10 +81,10 @@ public class ContinuousFeedback : MonoBehaviour
         {
             particles[i].transform.localScale = new Vector3(curScaleVal, curScaleVal, curScaleVal);
         }*/
-        float scaleVal = Mathf.Lerp(minScale, maxScale, confidence);
         for (int i = 0; i < psMains.Length; i++)
         {
-            particles[i].transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
+            float scaleVal = Mathf.Lerp(particles[i].minScale, particles[i].maxScale, confidence);
+            particles[i].particleSystem.transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
         }
     }
 

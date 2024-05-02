@@ -23,6 +23,8 @@ public class PhaseManager : MonoBehaviour
     WaveSpawner waveSpawner;
 
     public Intensity intensity;
+    public Intensity GetIntensity() { return intensity; }
+
     public int BCIExercisesPerTriangle = 1;
     public int triangles = 1;
     public int iterations = 1;

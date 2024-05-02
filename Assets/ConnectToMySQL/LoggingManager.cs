@@ -63,6 +63,8 @@ public class LoggingManager : MonoBehaviour
 
     public TMP_Text manaText;
 
+    public PhaseManager phaseManager;   
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -155,6 +157,10 @@ public class LoggingManager : MonoBehaviour
                 if (!collections[collectionLabel].log.ContainsKey("Email")) {
                 collections[collectionLabel].log["Email"] = new Dictionary<int, object>();
                 }
+                if (!collections[collectionLabel].log.ContainsKey("Version"))
+                {
+                    collections[collectionLabel].log["Version"] = new Dictionary<int, object>();
+                }
                 if (!collections[collectionLabel].log.ContainsKey("Phase"))
                 {
                     collections[collectionLabel].log["Phase"] = new Dictionary<int, object>();
@@ -180,6 +186,8 @@ public class LoggingManager : MonoBehaviour
                 collections[collectionLabel].log["Phase"][count] = phase;
 
             collections[collectionLabel].log["BuildState"][count] = buildState;
+
+            collections[collectionLabel].log["Version"][count] = phaseManager.GetIntensity();
 
             collections[collectionLabel].log["Mana"][count] = manaText.text;
 
@@ -212,6 +220,10 @@ public class LoggingManager : MonoBehaviour
                 if (!collections[collectionLabel].log.ContainsKey("Email")) {
                 collections[collectionLabel].log["Email"] = new Dictionary<int, object>();
                 }
+            if (!collections[collectionLabel].log.ContainsKey("Version"))
+            {
+                collections[collectionLabel].log["Version"] = new Dictionary<int, object>();
+            }
             if (!collections[collectionLabel].log.ContainsKey("Phase"))
             {
                 collections[collectionLabel].log["Phase"] = new Dictionary<int, object>();
@@ -238,6 +250,8 @@ public class LoggingManager : MonoBehaviour
             collections[collectionLabel].log["Phase"][count] = phase;
 
         collections[collectionLabel].log["BuildState"][count] = buildState;
+
+        collections[collectionLabel].log["Version"][count] = phaseManager.GetIntensity();
 
         collections[collectionLabel].log["Mana"][count] = manaText.text;
 

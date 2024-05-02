@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
+using static BuildMode;
 
 public enum BuildState
 {
@@ -154,6 +155,8 @@ public class BuildMode : MonoBehaviour
 
     public TMP_Text timerText;
 
+    bool blockPlaced = false;
+
     private void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -180,8 +183,8 @@ public class BuildMode : MonoBehaviour
             }
         }
         greyOverlays = greyOverlayList.ToArray();
-        characterInitialLocalPos = character.transform.localPosition;
-        characterStartTrans = character.transform.parent;
+        //characterInitialLocalPos = character.transform.localPosition;
+        //characterStartTrans = character.transform.parent;
         spriteBCIHand.SetActive(false);
     }
 
@@ -198,8 +201,10 @@ public class BuildMode : MonoBehaviour
 
     public void StartBuildMode()
     {
-        character.transform.parent = characterUITrans;
-        character.transform.localPosition = Vector3.zero;
+        character.SetActive(true);
+
+        //character.transform.parent = characterUITrans;
+        //character.transform.localPosition = Vector3.zero;
         SwitchState(BuildState.PickBlock);
     }
 
@@ -315,9 +320,7 @@ public class BuildMode : MonoBehaviour
 
                 PickBlockStart();
                 playerCharAnimator.SetBool("PickedPlacement", false);
-                
-                if (!noMoreDefending)
-                    backToDefendingBtn.SetActive(true);
+               
 
                 pickBlockUI.SetActive(true);
                 break;
@@ -505,6 +508,26 @@ public class BuildMode : MonoBehaviour
             }
         }
 
+        if (state == BuildState.PlaceBlock || state == BuildState.BlockPlaceTransition)
+        {
+            placeBlockTimer -= Time.fixedDeltaTime;
+            timerText.text = GetTimerText(placeBlockTimer);
+            if (!placeBlockReachedMinTime && placeBlockMaxTime - placeBlockTimer > placeBlockMinTime)
+            {
+                placeBlockReachedMinTime = true;
+            }
+
+            if (placeBlockMaxTime - placeBlockTimer > placeBlockShowTime)
+            {
+                timerText.gameObject.SetActive(true);
+            }
+
+            if (placeBlockTimer <= 0)
+            {
+                ChooseRandomPlacement();
+            }
+        }
+
         switch (state)
         {
             case BuildState.PickBlock:
@@ -527,49 +550,22 @@ public class BuildMode : MonoBehaviour
                 }
                 break;           
             case BuildState.PlaceBlock:
-                placeBlockTimer -= Time.fixedDeltaTime;
-                timerText.text = GetTimerText(placeBlockTimer);
-                if (!placeBlockReachedMinTime && placeBlockMaxTime - placeBlockTimer > placeBlockMinTime)
-                {
-                    placeBlockReachedMinTime = true;
-                }
-
-                if (placeBlockMaxTime - placeBlockTimer > placeBlockShowTime)
-                {
-                    timerText.gameObject.SetActive(true);
-                }
-
-                if (placeBlockTimer <= 0)
-                {
-                    ChooseRandomPlacement();
-                }
                 break;
             case BuildState.BlockPlaceTransition:
+                if (blockPlaced) return;
                 placingTimer += Time.fixedDeltaTime;
                 float t = placingTimer / placingTime;
                 
                 conjuredBlock.transform.position = Vector3.Lerp(placingBlockStartPos, placingBlockEndPos, t);
                 if (t >= 1)
                 {
-                    placingTimer = 0;
-                    conjuredBlock.transform.parent = blockEndTrans;
-                    onBlockPlaced.Invoke();
-
-                    if (phaseManager.BeenThroughEnoughExercises(blocksConjuredTotal))
-                    {
-                        character.SetActive(false);
-                        magicTrailPE.SetActive(false);
-                        SwitchState(BuildState.None);
-                        phaseManager.DoneWithVersion();
-                    }
-                    else if (phaseManager.HaveEnoughMana(1))
-                        SwitchState(BuildState.PickBlock);
-                    else
-                        DoneBuilding();
+                    StartCoroutine(WaitAfterPlacing());
+                    blockPlaced = true;
                 }
                 break;
         }
     }
+
 
     public void HideUIHand(InputWindowState inputWindow)
     {
@@ -581,17 +577,46 @@ public class BuildMode : MonoBehaviour
 
     public void DoneBuilding()
     {
-        character.transform.parent = characterStartTrans;
-        character.transform.localPosition = characterInitialLocalPos;
+        character.SetActive(false);
+
+        //character.transform.parent = characterStartTrans;
+        //character.transform.localPosition = characterInitialLocalPos;
         SwitchState(BuildState.None);
         onBuildEnd.Invoke();
     }
 
-    IEnumerator StartPlacing(Vector2Int gridPos, PlacementType type)
+    IEnumerator WaitAfterPlacing()
+    {
+        yield return new WaitUntil(() => placeBlockReachedMinTime);
+        placeBlockReachedMinTime = false;
+        blockPlaced = false;
+
+        placingTimer = 0;
+        conjuredBlock.transform.parent = blockEndTrans;
+        onBlockPlaced.Invoke();
+
+        if (phaseManager.BeenThroughEnoughExercises(blocksConjuredTotal))
+        {
+            character.SetActive(false);
+            magicTrailPE.SetActive(false);
+            SwitchState(BuildState.None);
+            phaseManager.DoneWithVersion();
+        }
+        else if (phaseManager.HaveEnoughMana(1))
+        {
+            SwitchState(BuildState.PickBlock);
+            if (!noMoreDefending)
+                backToDefendingBtn.SetActive(true);
+        }
+        else
+            DoneBuilding();
+    }
+
+    void StartPlacing(Vector2Int gridPos, PlacementType type)
     {
         placeBlockUI.SetActive(false);
 
-        yield return new WaitUntil(() => placeBlockReachedMinTime);
+        //yield return new WaitUntil(() => placeBlockReachedMinTime);
         print(gridPos);
         //Destroy(posOptionBtns[gridPos.x, gridPos.y]);
 
@@ -622,7 +647,7 @@ public class BuildMode : MonoBehaviour
 
     void PositionChosen(Vector2Int gridPos, PlacementType type)
     {
-        StartCoroutine(StartPlacing(gridPos, type));
+        StartPlacing(gridPos, type);
     }
 
     public void ConjureStone(GameDecisionData decisionData)//bool correctlyConjured)
