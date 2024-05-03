@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEditor;
 
 
 public struct GameData {
@@ -228,6 +229,19 @@ public class GameManager : MonoBehaviour
         if(gameState != GameState.Stopped) {
             EndGame();
         }
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (!focus)
+        {
+            LogEvent("GamePaused");
+        }
+        else
+        {
+            LogEvent("GameUnpaused");
+        }
+        print("focus? " + focus);
     }
 
     public void RunGame() {
