@@ -591,6 +591,16 @@ public class BuildMode : MonoBehaviour
         placeBlockReachedMinTime = false;
         blockPlaced = false;
 
+        foreach (GameObject btn in posOptionBtns)
+            if (btn != null)
+                Destroy(btn);
+        foreach (GameObject btn in posDecorationBtns)
+            if (btn != null)
+                Destroy(btn);
+
+        posOptionBtns.Clear();
+        posDecorationBtns.Clear();
+
         placingTimer = 0;
         conjuredBlock.transform.parent = blockEndTrans;
         onBlockPlaced.Invoke();
@@ -621,16 +631,6 @@ public class BuildMode : MonoBehaviour
         //Destroy(posOptionBtns[gridPos.x, gridPos.y]);
 
         UpdateBuildingCamera(gridPos.y);
-
-        foreach (GameObject btn in posOptionBtns)
-            if (btn != null)
-                Destroy(btn);
-        foreach (GameObject btn in posDecorationBtns)
-            if (btn != null)
-                Destroy(btn);
-
-        posOptionBtns.Clear();
-        posDecorationBtns.Clear();
 
         if (type == PlacementType.Block)
             gridManager.TakeBlockArea(new BoundsInt(new Vector3Int(gridPos.x, gridPos.y, 0), Vector3Int.one));
