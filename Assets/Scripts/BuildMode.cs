@@ -156,6 +156,7 @@ public class BuildMode : MonoBehaviour
     public TMP_Text timerText;
 
     bool blockPlaced = false;
+    bool placementChosen = false;
 
     private void Start()
     {
@@ -309,6 +310,7 @@ public class BuildMode : MonoBehaviour
         switch (state)
         {
             case BuildState.Conjure:
+                placementChosen = false;
                 spriteBCIHand.SetActive(true);
                 playerCharAnimator.SetBool("PickedBlock", true);
                 break;
@@ -522,9 +524,10 @@ public class BuildMode : MonoBehaviour
                 timerText.gameObject.SetActive(true);
             }
 
-            if (placeBlockTimer <= 0)
+            if (placeBlockTimer <= 0 && !placementChosen)
             {
                 ChooseRandomPlacement();
+                placementChosen = true;
             }
         }
 
