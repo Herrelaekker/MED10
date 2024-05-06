@@ -120,6 +120,7 @@ public class OpenBCIInput : MonoBehaviour
 
     ContinuousFeedback continuousFeedback;
 
+    BuildMode buildMode;
     void Start()
     {
         if (instance == null) {
@@ -131,6 +132,7 @@ public class OpenBCIInput : MonoBehaviour
         consecThresholdBufferVal = new float[consecutiveBufferSize];
         bciState = BCIState.Disconnected;
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
+        buildMode = FindObjectOfType<BuildMode>();
         LogMeta();
         onBCIStateChanged.Invoke(Enum.GetName(typeof(BCIState), bciState), "");
         StartCoroutine("ConnectToBCI");
@@ -142,8 +144,9 @@ public class OpenBCIInput : MonoBehaviour
     private void LogMeta() {
         Dictionary<string, object> metaLog = new Dictionary<string, object>() {
             {"ConfidenceThreshold", classificationThreshold},
+            {"GoldenConfidenceThreshold", classificationGoldenThreshold},
             {"BCIProcessingMode", Enum.GetName(typeof(BCIProcessingMode), bciProcessingMode)},
-            {"ConsecutiveThresholdBufferSize", consecutiveBufferSize},
+            {"ConsecutiveThresholdBufferSize", consecutiveBufferSize}
         };
         loggingManager.Log("Meta", metaLog);
     }
@@ -155,6 +158,7 @@ public class OpenBCIInput : MonoBehaviour
     MotorImageryEvent miEventSaved;
     public void SaveMI(MotorImageryEvent miEvent)
     {
+
         if (miEvent != MotorImageryEvent.Rest)
             consecThresholdBufferValSaved = consecThresholdBufferVal;
         inputNumberSaved = inputNumber;
@@ -163,12 +167,28 @@ public class OpenBCIInput : MonoBehaviour
         miEventSaved = miEvent;
     }
 
+    int restAmount = 0;
+    int miAmount = 0;
+    int miGoldenAmount = 0;
     public void LogMotorImageryEvent() {
+
+        MotorImageryEvent classification = miEventSaved;
+        if (classification == MotorImageryEvent.Rest)
+            restAmount++;
+        else if (classification == MotorImageryEvent.MotorImagery)
+            miAmount++;
+        else if (classification == MotorImageryEvent.GoldenMotorImagery)
+            miGoldenAmount++;
+
         Dictionary<string, object> gameLog = new Dictionary<string, object>() {
-            {"Event", Enum.GetName(typeof(MotorImageryEvent), miEventSaved)},
+            {"Event", "ConjuredBlock"},//Enum.GetName(typeof(MotorImageryEvent), miEventSaved)},
             {"BCIConfidence", confidenceSaved},
             {"BCIState", Enum.GetName(typeof(BCIState), bciStateSaved)},
+            {"MotorImageryType",  Enum.GetName(typeof(MotorImageryEvent), miEventSaved)},
             {"InputNumber", inputNumberSaved},
+            {"RestAmount", restAmount },
+            {"MotorImageryAmount", miAmount },
+            {"GoldenMotorImageryAmount", miGoldenAmount }
         };
         loggingManager.Log("Game", gameLog);
         if (bciProcessingMode == BCIProcessingMode.ConsecutiveThreshold && miEventSaved != MotorImageryEvent.Rest)
@@ -210,10 +230,12 @@ public class OpenBCIInput : MonoBehaviour
            // No Stream available.
            return;
        }
-       // Update() runs faster (1/60) than our input data (1/16) arrives.
-       // The code below is only run whenever a new value comes in from the BCI side.
-       LogSample("Sample");
-       continuousFeedback.SetConfidence(confidence);
+        // Update() runs faster (1/60) than our input data (1/16) arrives.
+        // The code below is only run whenever a new value comes in from the BCI side.
+        BuildState state = buildMode.GetBuildState();
+        if (state == BuildState.Conjure || state == BuildState.Prepare)
+            LogSample("Sample");
+        continuousFeedback.SetConfidence(confidence);
        InputData inputData = new InputData();
        inputData.confidence = 1 - confidence;
        inputData.type = InputType.MotorImagery;

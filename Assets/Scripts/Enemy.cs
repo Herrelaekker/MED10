@@ -71,10 +71,10 @@ public class Enemy : MonoBehaviour
         return new Vector3(finalScale, finalScale, finalScale);
     }
 
-    void Die()
+    void Die(bool deathByArrow = false)
     {
         deathSound.Play();
-        waveSpawner.EnemiesKilled(1);
+        waveSpawner.EnemiesKilled(1, deathByArrow);
         animator.SetBool("dead", true);
         dead = true;
         if (arrowShooter)
@@ -85,7 +85,7 @@ public class Enemy : MonoBehaviour
         health -= 1;
         if (health <= 0)
         {
-            Die();
+            Die(true);
         }
     }
 

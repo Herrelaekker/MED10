@@ -6,6 +6,7 @@ using UnityEngine.Timeline;
 public enum SoundState {
     RejectSound,
     CorrectSound,
+    BestSound,
     None
 }
 
@@ -19,9 +20,14 @@ public class BackgroundSound
 public class SoundManager : MonoBehaviour
 {
     [SerializeField]
+    private AudioSource bestSound;
+    [SerializeField]
     private AudioSource correctSound;
     [SerializeField]
     private AudioSource wrongSound;
+
+    [SerializeField]
+    private AudioSource uiBtnSound;
     private SoundState soundState = SoundState.None;
     private bool madeDecision = false;
 
@@ -80,6 +86,12 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void PlayUISound()
+    {
+        uiBtnSound.pitch = Random.Range(0.85f, 1.15f);
+        uiBtnSound.Play();
+    }
+
     IEnumerator FadeTrack(BackgroundSound[] nextTrack)
     {
         float timeToFade = 1f;
@@ -108,10 +120,17 @@ public class SoundManager : MonoBehaviour
     }
 
     public void OnGameDecision(GameDecisionData decisionData) {
-        if (decisionData.decision == TrialType.AccInput) {
+        if (decisionData.classification == MotorImageryEvent.GoldenMotorImagery)
+        {
+            bestSound.Play();
+            soundState = SoundState.BestSound;
+        }
+        if (decisionData.classification == MotorImageryEvent.MotorImagery)
+        {
             correctSound.Play();
             soundState = SoundState.CorrectSound;
-        } else {
+        }
+        else {
             soundState = SoundState.RejectSound;
             wrongSound.Play();
             soundState = SoundState.None;

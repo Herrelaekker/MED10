@@ -3,8 +3,10 @@ using ExternalPropertyAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics.Tracing;
 using System.Threading;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Tilemaps;
@@ -15,6 +17,7 @@ public enum BuildState
 {
     None,
     PickBlock,
+    Prepare,
     Conjure,
     PlaceBlock,
     BlockPlaceTransition
@@ -29,6 +32,8 @@ public enum PlacementType
 public class BuildMode : MonoBehaviour
 {
     private BuildState state = BuildState.None;
+    public BuildState GetBuildState() { return state; }
+
     public GameObject pickBlockUI;
     public GameObject placeBlockUI;
 
@@ -157,11 +162,17 @@ public class BuildMode : MonoBehaviour
 
     bool blockPlaced = false;
     bool placementChosen = false;
+    bool hasPickedBlock = false;
+
+    string pickedBlockName;
+    Vector2Int pickedPlacement;
+    SoundManager soundManager;
 
     private void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
 
+        soundManager = FindObjectOfType<SoundManager>();
         camera = Camera.main;
         switcher = camera.GetComponent<CinemachineSwitcher>();
         gridManager = FindObjectOfType<GridManager>();
@@ -284,12 +295,29 @@ public class BuildMode : MonoBehaviour
         }
         GreyOutDecorations(noGreen);
     }
+
+    int blockAmount = 0;
+    int decorationAmount = 0;
     private void LogEvent(string eventLabel)
     {
         Dictionary<string, object> gameLog = new Dictionary<string, object>() {
             {"Event", eventLabel},
-            {"BlockType" , curPlacementType}
+            {"BlockType" , curPlacementType},
+            {"BlockAmount", blockAmount },
+            {"DecorationAmount", decorationAmount}
         };
+        if (pickedBlock)
+        {
+            pickedBlockName = pickedBlock.name;
+
+            gameLog.Add("BlockName", pickedBlockName);
+        }
+        if (pickedPlacement != null)
+        {
+            gameLog.Add("BlockPlacement", pickedPlacement);
+            gameLog.Add("BlockPlacementX", pickedPlacement.x);
+            gameLog.Add("BlockPlacementY", pickedPlacement.y);
+        }
 
         loggingManager.Log("Game", gameLog);
     }
@@ -309,10 +337,12 @@ public class BuildMode : MonoBehaviour
 
         switch (state)
         {
-            case BuildState.Conjure:
+            case BuildState.Prepare:
                 placementChosen = false;
                 spriteBCIHand.SetActive(true);
                 playerCharAnimator.SetBool("PickedBlock", true);
+                break;
+            case BuildState.Conjure:
                 break;
             case BuildState.BlockPlaceTransition:
                 playerCharAnimator.SetBool("PickedPlacement", true);
@@ -420,21 +450,31 @@ public class BuildMode : MonoBehaviour
         magicBurstPE.SetActive(false);
         magicTrailPE.SetActive(false);
         pickBlockUI.SetActive(false);
+
+        hasPickedBlock = true;
         HidePositons();
-        
+
+        if (curPlacementType == PlacementType.Block)
+            blockAmount++;
+        else if (curPlacementType == PlacementType.Decoration)
+            decorationAmount++;
+
         yield return new WaitUntil(() => pickBlockReachedMinTime);
 
         gameManager.ResumeTrial();
 
         pickBlockReachedMinTime = false;
         pickedBlock = block;
-        SwitchState(BuildState.Conjure);
+        LogEvent("BlockPicked");
+        SwitchState(BuildState.Prepare);
         StartCoroutine(ConjuringStarted(timeBeforeInputWindow));
+        hasPickedBlock = false;
     }
 
     IEnumerator ConjuringStarted(float seconds)
     {
         yield return new WaitForSeconds(seconds);
+        SwitchState(BuildState.Conjure);
         magicPE.SetActive(true);
         onStartConjureBlock.Invoke();
     }
@@ -463,7 +503,7 @@ public class BuildMode : MonoBehaviour
         if (t > 1) { t = 1; }
 
         orthoSizeBefore = buildingCam.m_Lens.OrthographicSize;
-        posBefore = buildingCam.transform.position;
+        posBefore = buildingCam.transform.localPosition;
 
         orthoSize = Mathf.Lerp(minOrthoSize, maxOrthoSize, t);
         yPos = Mathf.Lerp(minBuildCamYpos, maxBuildCamYpos, t);
@@ -498,9 +538,9 @@ public class BuildMode : MonoBehaviour
             cameraChangeTimer += Time.fixedDeltaTime;
 
             float t = cameraChangeTimer / timeToChangeCamera;
-            Vector3 cameraPos = buildingCam.transform.position;
+            Vector3 cameraPos = buildingCam.transform.localPosition;
 
-            buildingCam.transform.position = Vector3.Lerp(posBefore, new Vector3(cameraPos.x, yPos, cameraPos.z), t);
+            buildingCam.transform.localPosition = Vector3.Lerp(posBefore, new Vector3(cameraPos.x, yPos, cameraPos.z), t);
             buildingCam.m_Lens.OrthographicSize = Mathf.Lerp(orthoSizeBefore, orthoSize, t);
 
             if (cameraChangeTimer > timeToChangeCamera)
@@ -527,6 +567,7 @@ public class BuildMode : MonoBehaviour
             if (placeBlockTimer <= 0 && !placementChosen)
             {
                 ChooseRandomPlacement();
+                LogEvent("PlaceBlockRandomly");
                 placementChosen = true;
             }
         }
@@ -546,10 +587,13 @@ public class BuildMode : MonoBehaviour
                     timerText.gameObject.SetActive(true);
                 }
 
-                if (pickBlockTimer <= 0)
+                if (pickBlockTimer <= 0 && !hasPickedBlock)
                 {
                     int rndIndex = Random.Range(0, blockPrefabs.Length);
+
                     PickedBlock(blockPrefabs[rndIndex]);
+                    LogEvent("PickedBlockRandomly");
+
                 }
                 break;           
             case BuildState.PlaceBlock:
@@ -650,14 +694,20 @@ public class BuildMode : MonoBehaviour
 
     void PositionChosen(Vector2Int gridPos, PlacementType type)
     {
+        soundManager.PlayUISound();
         StartPlacing(gridPos, type);
+        pickedPlacement = gridPos;
+        placementChosen = true;
+
+        LogEvent("PositionChosen");
     }
 
     public void ConjureStone(GameDecisionData decisionData)//bool correctlyConjured)
     {
         conjureTimer = 0;
         blocksConjuredTotal++;
-        conjuredBlock = Instantiate(pickedBlock, conjuringTransform);
+        conjuredBlock = Instantiate(pickedBlock);
+        conjuredBlock.transform.position = conjuringTransform.position;
         conjuredBlock.transform.parent = null;
 
         magicPE.SetActive(false);

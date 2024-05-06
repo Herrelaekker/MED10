@@ -105,6 +105,8 @@ public class GameManager : MonoBehaviour
     SimBCIInput fabBCIInput;
     OpenBCIInput openBCIInput;
 
+    bool hasStarted = false;
+
     void Start()
     {
         loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
@@ -115,6 +117,8 @@ public class GameManager : MonoBehaviour
 
         fabBCIInput = FindObjectOfType<SimBCIInput>();
         openBCIInput = FindObjectOfType<OpenBCIInput>();
+
+        hasStarted = true;
     }
 
     private void SetupMechanisms() {
@@ -239,6 +243,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            if (hasStarted)
             LogEvent("GameUnpaused");
         }
         print("focus? " + focus);

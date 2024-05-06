@@ -58,11 +58,12 @@ public class MagicAttack : MonoBehaviour
 
         loggingManager.Log("Game", gameLog);
     }
-    private void LogEnemiesKilledEvent(string eventLabel, float enemies)
+    private void LogEnemiesKilledEvent(string eventLabel, int enemies)
     {
         Dictionary<string, object> gameLog = new Dictionary<string, object>() {
             {"Event", eventLabel},
-            {"EnemiesKilled", enemies}
+            {"MagicKill", enemies},
+            {"MagicKillTotal", deathAmountMagic }
         };
 
         loggingManager.Log("Game", gameLog);
@@ -99,8 +100,13 @@ public class MagicAttack : MonoBehaviour
         followMouse = true;
         explosionPE.transform.parent = null;
         StartCoroutine(RemoveParticleEffect());
-        LogEnemiesKilledEvent("ProjectileDone", waveSpawner.GetEnemiesKilledOneShot());
-            }
+        int enemiesKilled = waveSpawner.GetEnemiesKilledOneShot();
+        deathAmountMagic += enemiesKilled;
+        LogEnemiesKilledEvent("ProjectileDone", enemiesKilled);
+    }
+
+
+    int deathAmountMagic = 0;
 
     IEnumerator RemoveParticleEffect()
     {

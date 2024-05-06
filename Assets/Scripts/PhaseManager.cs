@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System.IO;
 using System;
+using System.Diagnostics.Tracing;
 
 public enum Intensity { 
 A, B, C
@@ -41,7 +42,10 @@ public class PhaseManager : MonoBehaviour
 
     public GameObject doneUI;
 
+    public GameObject wandUI;
     string filestamp;
+
+    int manaGainedTotal = 0;
 
     // Update is called once per frame
     void TakeScreenshot(string screenshotName)
@@ -53,6 +57,8 @@ public class PhaseManager : MonoBehaviour
     private void Start()
     {
         doneUI.SetActive(false);
+        wandUI.SetActive(false);
+
 
         gameManager = FindObjectOfType<GameManager>();
 
@@ -122,6 +128,7 @@ public class PhaseManager : MonoBehaviour
     {
         loggingManager.SetPhase("Build");
         LogEvent("SwitchPhase", "Build");
+        wandUI.SetActive(true);
         buildMode.StartBuildMode();
         soundManager.SwapTrack(true);
 
@@ -129,10 +136,12 @@ public class PhaseManager : MonoBehaviour
 
     void GoToBattleMode()
     {
+        wandUI.SetActive(false);
         bgAnimator.SetInteger("Phase", 2);
     }
     void GoToBuildMode()
     {
+
         bgAnimator.SetInteger("Phase", 1);
         switcher.SwitchState("Build");
         magicAttack.DisableMagicAttack();
@@ -142,7 +151,8 @@ public class PhaseManager : MonoBehaviour
     {
         Dictionary<string, object> gameLog = new Dictionary<string, object>() {
             {"Event", eventLabel},
-            {"Phase", phase}
+            {"Phase", phase},
+            {"ManaTotal", manaGainedTotal}
         };
 
         loggingManager.Log("Game", gameLog);
@@ -178,14 +188,33 @@ public class PhaseManager : MonoBehaviour
     public void AddToMana(int addedMana)
     {
         addedMana *= manaAmountPerEnemy;
-        if (mana + addedMana > maxManaPerPhase * manaAmountPerEnemy)
+
+        if (manaGainedTotal > maxManaPerPhase * manaAmountPerEnemy)
         {
-            mana = maxManaPerPhase * manaAmountPerEnemy;
+            int difference = manaGainedTotal - maxManaPerPhase * manaAmountPerEnemy;
+
+            mana += addedMana;
+            mana -= difference;
+
+            manaGainedTotal = maxManaPerPhase * manaAmountPerEnemy;
         }
         else
         {
             mana += addedMana;
+            manaGainedTotal += addedMana;
         }
+
+        /*if (mana + addedMana > maxManaPerPhase * manaAmountPerEnemy - manaGainedTotal)
+        {
+            mana = maxManaPerPhase * manaAmountPerEnemy - manaGainedTotal;
+            manaGainedTotal = maxManaPerPhase * manaAmountPerEnemy;
+        }
+        else
+        {
+            mana += addedMana;
+            manaGainedTotal += addedMana;
+        }*/
+
         manaText.text = mana.ToString();
     }
 

@@ -57,9 +57,12 @@ public class WaveSpawner : MonoBehaviour
     Vector3 blowEffectStartPos;
     public Transform blowEffectEndPos;
 
+    LoggingManager loggingManager;
 
     private void Awake()
     {
+        loggingManager = GameObject.Find("LoggingManager").GetComponent<LoggingManager>();
+
         battleMode = FindObjectOfType<BattleMode>();
         phaseManager = FindObjectOfType<PhaseManager>();
         totalSpawnRangeX = Mathf.Abs(spawnRangeTrans1.position.x) + Mathf.Abs(spawnRangeTrans2.position.x);
@@ -130,6 +133,19 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
+    int deathAmountArrow = 0;
+
+    void LogArrowDeath(string eventLabel, int deathAmount)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel},
+            {"ArrowKill", deathAmount},
+            {"ArrowKillTotal", deathAmountArrow}
+        };
+
+        loggingManager.Log("Game", gameLog);
+    }
+
     public int GetEnemiesKilledOneShot()
     {
         int amount = enemiesKilledOneShot;
@@ -139,9 +155,18 @@ public class WaveSpawner : MonoBehaviour
     }
 
     int enemiesKilledOneShot = 0;
-    public void EnemiesKilled(int amount)
+    public void EnemiesKilled(int amount, bool deathByArrow = false)
     {
-        enemiesKilledOneShot += amount;
+        if (!deathByArrow)
+        {
+            enemiesKilledOneShot += amount;
+        }
+        else
+        {
+            deathAmountArrow += amount;
+            LogArrowDeath("ArrowKill", amount);
+        }
+
         if (deathAmount + amount <= maxDeathAmount)
         {
             deathTotal += amount;
