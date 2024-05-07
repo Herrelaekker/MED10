@@ -47,6 +47,8 @@ public class PhaseManager : MonoBehaviour
 
     int manaGainedTotal = 0;
 
+    int triangleCount = 0;
+
     // Update is called once per frame
     void TakeScreenshot(string screenshotName)
     {
@@ -146,12 +148,13 @@ public class PhaseManager : MonoBehaviour
 
     void GoToBattleMode()
     {
+        triangleCount++;
+
         wandUI.SetActive(false);
         bgAnimator.SetInteger("Phase", 2);
     }
     void GoToBuildMode()
     {
-
         bgAnimator.SetInteger("Phase", 1);
         switcher.SwitchState("Build");
         magicAttack.DisableMagicAttack();
@@ -200,7 +203,18 @@ public class PhaseManager : MonoBehaviour
         addedMana *= manaAmountPerEnemy;
         manaGainedTotal += addedMana;
 
-        if (manaGainedTotal > maxManaPerPhase * manaAmountPerEnemy)
+        if (intensity == Intensity.A)
+        {
+            mana += addedMana;
+            print(triangleCount);
+                manaGainedTotal = maxManaPerPhase * manaAmountPerEnemy * triangleCount;
+            if (mana >  maxManaPerPhase * manaAmountPerEnemy)
+            {
+                mana = maxManaPerPhase * manaAmountPerEnemy;
+
+            }
+        }
+        else if (manaGainedTotal > maxManaPerPhase * manaAmountPerEnemy)
         {
             int difference = manaGainedTotal - maxManaPerPhase * manaAmountPerEnemy;
 
