@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Globalization;
 using TMPro;
+using UnityEngine.EventSystems;
 public enum LogMode {
     Append,
     Overwrite
@@ -73,6 +74,52 @@ public class LoggingManager : MonoBehaviour
         if (savePath == "") {
             savePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
         }
+    }
+
+    private void Update()
+    {
+        // Check if there is a touch
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            // Check if finger is over a UI element
+            if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+            {
+                Debug.Log("Touched the UI");
+
+
+
+                Vector2 mousePosition = Input.mousePosition;
+
+                string hitName = "";
+                Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.zero);
+
+                if (hit)
+                {
+                    hitName = hit.transform.name;
+
+                }
+
+                print("hitName = " + hitName);
+
+                LogClick("Click", mousePosition, hitName);
+            }
+        }
+    
+    }
+
+    void LogClick(string eventLabel, Vector2 mousePos, string hitName)
+    {
+        Dictionary<string, object> gameLog = new Dictionary<string, object>() {
+            {"Event", eventLabel},
+            {"MousePos", mousePos},
+            {"MousePosX", mousePos.x},
+            {"MousePosY", mousePos.y},
+        };
+        if (hitName != "")
+            gameLog.Add("ClickedOn", hitName );
+
+        Log("Game", gameLog);
     }
 
     public void GenerateUIDs() {

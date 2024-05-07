@@ -198,6 +198,7 @@ public class BuildMode : MonoBehaviour
         //characterInitialLocalPos = character.transform.localPosition;
         //characterStartTrans = character.transform.parent;
         spriteBCIHand.SetActive(false);
+        pickBlockMaxTime -= placingTime;
     }
 
     void GreyOutDecorations(bool greyOut)
@@ -348,7 +349,7 @@ public class BuildMode : MonoBehaviour
                 playerCharAnimator.SetBool("PickedPlacement", true);
                 break;
             case BuildState.PickBlock:
-                pickBlockTimer = pickBlockMaxTime - placingTime;
+                pickBlockTimer = pickBlockMaxTime;
 
                 PickBlockStart();
                 playerCharAnimator.SetBool("PickedPlacement", false);
@@ -451,6 +452,8 @@ public class BuildMode : MonoBehaviour
         magicTrailPE.SetActive(false);
         pickBlockUI.SetActive(false);
 
+        print("PreparingConjuring");
+
         hasPickedBlock = true;
         HidePositons();
 
@@ -459,13 +462,13 @@ public class BuildMode : MonoBehaviour
         else if (curPlacementType == PlacementType.Decoration)
             decorationAmount++;
 
-        yield return new WaitUntil(() => pickBlockReachedMinTime);
+        LogEvent("BlockPicked");
+        backToDefendingBtn.SetActive(false);
 
-        gameManager.ResumeTrial();
+        yield return new WaitUntil(() => pickBlockReachedMinTime);
 
         pickBlockReachedMinTime = false;
         pickedBlock = block;
-        LogEvent("BlockPicked");
         SwitchState(BuildState.Prepare);
         StartCoroutine(ConjuringStarted(timeBeforeInputWindow));
         hasPickedBlock = false;
@@ -473,6 +476,8 @@ public class BuildMode : MonoBehaviour
 
     IEnumerator ConjuringStarted(float seconds)
     {
+        gameManager.ResumeTrial();
+
         yield return new WaitForSeconds(seconds);
         SwitchState(BuildState.Conjure);
         magicPE.SetActive(true);
@@ -625,6 +630,7 @@ public class BuildMode : MonoBehaviour
     public void DoneBuilding()
     {
         character.SetActive(false);
+        RemoveOptions();
 
         //character.transform.parent = characterStartTrans;
         //character.transform.localPosition = characterInitialLocalPos;
@@ -632,12 +638,8 @@ public class BuildMode : MonoBehaviour
         onBuildEnd.Invoke();
     }
 
-    IEnumerator WaitAfterPlacing()
+    void RemoveOptions()
     {
-        yield return new WaitUntil(() => placeBlockReachedMinTime);
-        placeBlockReachedMinTime = false;
-        blockPlaced = false;
-
         foreach (GameObject btn in posOptionBtns)
             if (btn != null)
                 Destroy(btn);
@@ -647,6 +649,15 @@ public class BuildMode : MonoBehaviour
 
         posOptionBtns.Clear();
         posDecorationBtns.Clear();
+    }
+
+    IEnumerator WaitAfterPlacing()
+    {
+        yield return new WaitUntil(() => placeBlockReachedMinTime);
+        placeBlockReachedMinTime = false;
+        blockPlaced = false;
+
+        RemoveOptions();
 
         placingTimer = 0;
         conjuredBlock.transform.parent = blockEndTrans;
@@ -721,11 +732,14 @@ public class BuildMode : MonoBehaviour
         
         //LogBlockEvent("ConjureBlock", curPlacementType);
 
-        SwitchState(BuildState.PlaceBlock);
         onBlockConjured.Invoke();
 
         Block block = conjuredBlock.GetComponent<Block>();
         block.ChangeSprite(decisionData.classification);
+
+        SwitchState(BuildState.PlaceBlock);
+
+        gameManager.PauseTrial();
         //block.transform.GetChild(0).localPosition = Vector3.zero;
     }
 }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1578189213442995563}
   - component: {fileID: 9194104296207166406}
-  - component: {fileID: -1635833056647822545}
+  - component: {fileID: -2246862199432852779}
   m_Layer: 0
   m_Name: Decoration1
   m_TagString: Untagged
@@ -74,18 +74,18 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: d2d8e269ac3bd964889b65a5d603d94f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a089fad8a7ef24c48b283343e0e4f314, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.504, y: 0.504}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-1635833056647822545
+--- !u!114 &-2246862199432852779
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,5 +97,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e87358f5caa32824e8c2c58572a6a00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crackedSprite: {fileID: 21300000, guid: 4547bef1be10872489975360c393b58e, type: 3}
-  goldenSprite: {fileID: 21300000, guid: 244f4caabe8559048a9cda4624ad2e27, type: 3}
+  crackedSprite: {fileID: 21300000, guid: 0af24cab7e04a00469049bf8db793869, type: 3}
+  goldenSprite: {fileID: 21300000, guid: 1ffff0414228d594f934753ebe82150b, type: 3}

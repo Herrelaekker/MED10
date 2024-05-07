@@ -233,7 +233,7 @@ public class OpenBCIInput : MonoBehaviour
         // Update() runs faster (1/60) than our input data (1/16) arrives.
         // The code below is only run whenever a new value comes in from the BCI side.
         BuildState state = buildMode.GetBuildState();
-        if (state == BuildState.Conjure || state == BuildState.Prepare)
+        //if (state == BuildState.Conjure || state == BuildState.Prepare)
             LogSample("Sample");
         continuousFeedback.SetConfidence(confidence);
        InputData inputData = new InputData();
@@ -269,7 +269,11 @@ public class OpenBCIInput : MonoBehaviour
        if (confidence > classificationThreshold) {
            newClassification = MotorImageryEvent.MotorImagery;
        }
-       return newClassification;
+        if (confidence > classificationGoldenThreshold)
+        {
+            newClassification = MotorImageryEvent.GoldenMotorImagery;
+        }
+        return newClassification;
     }
 
     private MotorImageryEvent ProcessConsecutiveThreshold(float confidence) {

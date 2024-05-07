@@ -98,6 +98,16 @@ public class PhaseManager : MonoBehaviour
         //GoToBuildMode();
     }
 
+    int temp = 0;
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            TakeScreenshot("temp"+temp.ToString());
+            temp++;
+        }
+    }
+
     public void NoMoreDefending()
     {
         buildMode.NoMoreDefending();
@@ -188,6 +198,7 @@ public class PhaseManager : MonoBehaviour
     public void AddToMana(int addedMana)
     {
         addedMana *= manaAmountPerEnemy;
+        manaGainedTotal += addedMana;
 
         if (manaGainedTotal > maxManaPerPhase * manaAmountPerEnemy)
         {
@@ -201,7 +212,6 @@ public class PhaseManager : MonoBehaviour
         else
         {
             mana += addedMana;
-            manaGainedTotal += addedMana;
         }
 
         /*if (mana + addedMana > maxManaPerPhase * manaAmountPerEnemy - manaGainedTotal)

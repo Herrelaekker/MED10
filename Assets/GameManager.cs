@@ -397,6 +397,7 @@ public class GameManager : MonoBehaviour
 
     public void ResumeTrial() {
         gameState = GameState.Running;
+        interTrialTimer = 0f;
     }
 
     public void SetInputWindowSeconds(float time) {

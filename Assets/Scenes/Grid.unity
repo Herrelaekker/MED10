@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickBlockUI: {fileID: 40045165}
   placeBlockUI: {fileID: 234766813}
-  conjureTime: 3
+  conjureTime: 5
   placingTime: 1
   conjuringTransform: {fileID: 373112218}
   posOptionBtnPrefab: {fileID: 2999547512229102697, guid: 38c2bf0998dc4144f98412be7ea557f3,
@@ -373,18 +373,6 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
         m_MethodName: ConjureStone
         m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: PauseTrial
-        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1500,32 +1488,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 102885435}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 20331435}
-        m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
-        m_MethodName: PickedDecoration
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 433704978672412431, guid: cba07f5613f6c4a4f902cd6a34ac0c69,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ResumeTrial
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &102885435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2638,32 +2601,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 197468055}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 20331435}
-        m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
-        m_MethodName: PickedDecoration
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 433704978672412431, guid: f9ddcb1f7a08feb4890c0b86a027ae55,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ResumeTrial
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &197468055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5682,8 +5620,8 @@ MonoBehaviour:
   manaText: {fileID: 2089921438}
   bgAnimator: {fileID: 644593127}
   intensity: 2
-  BCIExercisesPerTriangle: 10
-  triangles: 3
+  BCIExercisesPerTriangle: 6
+  triangles: 5
   iterations: 1
   userChosenIntensityUI: {fileID: 654832561}
   manaAmountPerEnemy: 100
@@ -7265,32 +7203,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 800681120}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 20331435}
-        m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
-        m_MethodName: PickedDecoration
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 433704978672412431, guid: d6311cf5aea8a7f408ce937483b18760,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ResumeTrial
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &800681120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9263,7 +9176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6dc364a811949524496315f9da661b62, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 313c336fbfc25de46a9b1e3689acb4e9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -17950,7 +17863,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: ae8be1f148ec56c46b7e4c4cdeb7f55a, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 511e368787f27e243a47581dde05452d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.7
   m_Pitch: 1
@@ -18472,32 +18385,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1711342900}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 20331435}
-        m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
-        m_MethodName: PickedDecoration
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 433704978672412431, guid: a30b50c8148aa834591bb4f212b666d1,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ResumeTrial
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1711342900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19199,32 +19087,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1799091392}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 20331435}
-        m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
-        m_MethodName: PickedDecoration
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 433704978672412431, guid: a8b731e6221085043bebce3f31b5552c,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ResumeTrial
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1799091392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20892,32 +20755,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2017718808}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 20331435}
-        m_TargetAssemblyTypeName: BuildMode, Assembly-CSharp
-        m_MethodName: PickedDecoration
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 433704978672412431, guid: 2e00250227902d649a1454b8ca8a59a4,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 27532903}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ResumeTrial
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2017718808
 MonoBehaviour:
   m_ObjectHideFlags: 0
