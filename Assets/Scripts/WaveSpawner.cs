@@ -177,7 +177,7 @@ public class WaveSpawner : MonoBehaviour
         backToBuildingBtn.SetActive(true);
         onEnemiesKilled.Invoke(amount);
 
-        if (deathTotal >= deathTotalMax)
+        if (phaseManager.GetIntensity() == Intensity.C && deathTotal >= deathTotalMax)
         {
             deathAmount = maxDeathAmount;
             phaseManager.NoMoreDefending();
